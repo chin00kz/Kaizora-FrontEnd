@@ -9,6 +9,8 @@ import UserManagement from './pages/UserManagement';
 import DepartmentManagement from './pages/DepartmentManagement';
 import SubmitKaizen from './pages/SubmitKaizen';
 import MyKaizens from './pages/MyKaizens';
+import KaizenView from './pages/KaizenView';
+import QDMPortal from './pages/QDMPortal';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import { Toaster } from "@/components/ui/toaster"
@@ -79,6 +81,22 @@ function App() {
             <ProtectedRoute>
               <MainLayout>
                 <MyKaizens />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/kaizen/:kaizenId" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <KaizenView />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/qdm-portal" element={
+            <ProtectedRoute allowedRoles={['qdm', 'admin', 'superadmin']}>
+              <MainLayout>
+                <QDMPortal />
               </MainLayout>
             </ProtectedRoute>
           } />
