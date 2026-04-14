@@ -1,46 +1,72 @@
-import Sidebar from './Sidebar';
-import { useAuth } from '../context/AuthContext';
-import { Bell, Search } from 'lucide-react';
+import { AppSidebar } from "./app-sidebar"
+import { useAuth } from "../context/AuthContext"
+import { Bell, Search } from "lucide-react"
+import { 
+  SidebarProvider, 
+  SidebarInset, 
+  SidebarTrigger 
+} from "./ui/sidebar"
+import { Separator } from "./ui/separator"
+import { cn } from "../lib/utils"
 
 const MainLayout = ({ children }) => {
-  const { profile } = useAuth();
+  const { profile } = useAuth()
+  const isSuperAdmin = profile?.role === 'superadmin'
 
   return (
-    <div className="min-h-screen bg-[#0f172a]">
-      <Sidebar />
-      
-      <main className="ml-64 min-h-screen flex flex-col">
-        {/* Header */}
-        <header className="h-16 border-b border-white/5 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-40 px-8 flex items-center justify-between">
-          <div className="relative w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
-            <input 
-              type="text" 
-              placeholder="Search Kaizens, users..." 
-              className="w-full bg-slate-900 border border-slate-800 text-sm text-slate-300 rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
-            />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button className="relative p-2 text-slate-400 hover:text-white transition-colors hover:bg-slate-800 rounded-lg">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full border-2 border-[#0f172a]"></span>
-            </button>
-            <div className="h-4 w-px bg-white/10 mx-2"></div>
-            <div className="text-right">
-              <p className="text-xs font-medium text-white">{profile?.full_name}</p>
-              <p className="text-[10px] text-slate-500 tracking-wider uppercase font-bold">{profile?.role}</p>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-slate-50 transition-all duration-500">
+        <AppSidebar />
+        
+        <SidebarInset className="flex flex-col bg-background overflow-hidden relative">
+          {/* Header */}
+          <header className="flex h-16 shrink-0 items-center justify-between px-6 border-b border-slate-200 bg-white sticky top-0 z-40">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger className="-ml-1 text-slate-500 hover:text-primary transition-colors" />
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              
+              {/* Clean search bar */}
+              <div className="relative w-64 md:w-96 group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-primary transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="Search Kaizens, people..." 
+                  className="w-full bg-slate-50 border border-slate-200 text-sm text-slate-900 rounded-xl py-2 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all placeholder:text-slate-400"
+                />
+              </div>
             </div>
-          </div>
-        </header>
 
-        {/* Content Area */}
-        <div className="p-8 flex-1">
-          {children}
-        </div>
-      </main>
-    </div>
-  );
-};
+            <div className="flex items-center gap-6">
+              {/* Notifications */}
+              <button className="relative p-2 text-slate-500 hover:text-primary transition-all hover:bg-slate-100 rounded-xl group">
+                <Bell className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full border-2 border-white"></span>
+              </button>
 
-export default MainLayout;
+              <div className="flex items-center gap-4 pl-2 border-l border-slate-100">
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-semibold text-slate-900 leading-none mb-1">
+                    {profile?.full_name}
+                  </p>
+                  <p className={cn(
+                    "text-[10px] tracking-widest uppercase font-bold",
+                    isSuperAdmin ? "text-accent" : "text-primary"
+                  )}>
+                    {profile?.role}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Content Area */}
+          <main className="p-6 md:p-8 flex-1">
+            {children}
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
+  )
+}
+
+export default MainLayout
