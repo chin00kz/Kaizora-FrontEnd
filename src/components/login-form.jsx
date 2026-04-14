@@ -177,7 +177,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-[10px] text-slate-400 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary font-medium tracking-wide uppercase">
-        Protected by corporate security &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy</a>
+        Protected by Intern security &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy</a>
       </div>
     </div>
   );

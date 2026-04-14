@@ -24,7 +24,7 @@ export function RegisterForm({
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  
+
   const { signUp } = useAuth()
   const navigate = useNavigate()
 
@@ -66,12 +66,12 @@ export function RegisterForm({
               src={authBg}
               className="absolute inset-0 h-full w-full object-cover opacity-90 scale-x-[-1]" />
             <div className="absolute inset-0 bg-gradient-to-tr from-white/90 via-white/40 to-transparent"></div>
-            
+
             <div className="relative z-20 flex flex-col items-center text-center max-w-sm">
               <div className="bg-white p-8 rounded-[2rem] shadow-2xl shadow-slate-200/50 mb-10 border border-white/50 animate-in zoom-in-95 duration-700">
                 <img src={logo} alt="FedEx Advantis" className="w-48 object-contain" />
               </div>
-              
+
               <div className="w-16 h-2 bg-primary rounded-full shadow-lg shadow-primary/20"></div>
             </div>
           </div>
@@ -96,12 +96,12 @@ export function RegisterForm({
               <div className="space-y-5">
                 <div className="grid gap-2">
                   <Label htmlFor="fullName" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Full Name</Label>
-                  <Input 
-                    id="fullName" 
+                  <Input
+                    id="fullName"
                     name="fullName"
-                    type="text" 
-                    placeholder="John Doe" 
-                    required 
+                    type="text"
+                    placeholder="John Doe"
+                    required
                     className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
                     value={formData.fullName}
                     onChange={handleChange}
@@ -111,12 +111,12 @@ export function RegisterForm({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="email" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Email</Label>
-                    <Input 
-                      id="email" 
+                    <Input
+                      id="email"
                       name="email"
-                      type="email" 
-                      placeholder="m@advantis.express" 
-                      required 
+                      type="email"
+                      placeholder="m@advantis.express"
+                      required
                       className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
                       value={formData.email}
                       onChange={handleChange}
@@ -124,12 +124,12 @@ export function RegisterForm({
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="department" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Dept</Label>
-                    <Input 
-                      id="department" 
+                    <Input
+                      id="department"
                       name="department"
-                      type="text" 
-                      placeholder="IT / OPS" 
-                      required 
+                      type="text"
+                      placeholder="IT / OPS"
+                      required
                       className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
                       value={formData.department}
                       onChange={handleChange}
@@ -139,11 +139,11 @@ export function RegisterForm({
 
                 <div className="grid gap-2">
                   <Label htmlFor="password" title="Password" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Password</Label>
-                  <Input 
-                    id="password" 
+                  <Input
+                    id="password"
                     name="password"
-                    type="password" 
-                    required 
+                    type="password"
+                    required
                     className="h-12 bg-slate-50 border-slate-200 text-slate-900 focus:border-primary focus:ring-primary/20 rounded-xl"
                     value={formData.password}
                     onChange={handleChange}
@@ -154,7 +154,7 @@ export function RegisterForm({
               <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] text-base">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Account"}
               </Button>
-              
+
               <div className="text-center text-sm font-medium text-slate-500 mt-2">
                 Already have an account?{" "}
                 <Link to="/login" className="text-primary hover:underline font-bold underline-offset-4 flex items-center justify-center gap-1 mt-1 transition-colors">
@@ -166,7 +166,8 @@ export function RegisterForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-[10px] text-slate-400 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary font-medium tracking-wide uppercase leading-relaxed">
-        By signing up, you agree to drive continuous improvement <br/> within the FedEx ecosystem.
+        Protected by Intern security &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy</a> <br/>
+        By signing up, you agree to drive continuous improvement within the FedEx ecosystem.
       </div>
     </div>
   );

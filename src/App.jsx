@@ -4,31 +4,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // Auth Components
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import UserManagement from './pages/UserManagement';
+import DepartmentManagement from './pages/DepartmentManagement';
+import SubmitKaizen from './pages/SubmitKaizen';
+import MyKaizens from './pages/MyKaizens';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
-
-// Temporary placeholder components
-const Dashboard = () => (
-  <div className="space-y-4">
-    <h1 className="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 h-32 flex items-center justify-center shadow-sm">
-          <p className="text-slate-500">Statistic Card {i}</p>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const Management = () => (
-  <div className="space-y-4">
-    <h1 className="text-2xl font-bold text-slate-900">User Management</h1>
-    <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-      <p className="text-slate-500 italic">User administration tools will be implemented here.</p>
-    </div>
-  </div>
-);
+import { Toaster } from "@/components/ui/toaster"
 
 const AdminSettings = () => (
   <div className="space-y-4">
@@ -84,10 +67,34 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/submit-kaizen" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <SubmitKaizen />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/my-kaizens" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <MyKaizens />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
           <Route path="/management" element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
               <MainLayout>
-                <Management />
+                <UserManagement />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/department" element={
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
+              <MainLayout>
+                <DepartmentManagement />
               </MainLayout>
             </ProtectedRoute>
           } />
@@ -112,6 +119,7 @@ function App() {
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
+      <Toaster />
     </QueryClientProvider>
   );
 }
