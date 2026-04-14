@@ -23,6 +23,22 @@ const Dashboard = () => (
 
 const Management = () => <div className="text-white"><h1>Management Portal</h1></div>;
 const AdminSettings = () => <div className="text-white"><h1>Admin Settings</h1></div>;
+const SuperAdminPanel = () => (
+  <div className="space-y-4">
+    <div className="flex items-center gap-3 mb-6">
+      <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center border border-amber-500/30">
+        <span className="text-amber-400 text-xl">⚡</span>
+      </div>
+      <div>
+        <h1 className="text-2xl font-bold text-white">Super Admin Panel</h1>
+        <p className="text-slate-500 text-sm">Full system control — handle with care.</p>
+      </div>
+    </div>
+    <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6">
+      <p className="text-amber-400 font-semibold">⚠️ User management, system settings, and advanced controls will be built here.</p>
+    </div>
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -61,9 +77,17 @@ function App() {
           } />
 
           <Route path="/admin" element={
-            <ProtectedRoute allowedRoles={['admin']}>
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
               <MainLayout>
                 <AdminSettings />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/superadmin" element={
+            <ProtectedRoute allowedRoles={['superadmin']}>
+              <MainLayout>
+                <SuperAdminPanel />
               </MainLayout>
             </ProtectedRoute>
           } />

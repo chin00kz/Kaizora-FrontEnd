@@ -2,11 +2,14 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * Protects routes based on auth state and role.
+ * Superadmin always bypasses role checks.
+ */
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
 
-  // Show a full-page spinner while auth state is resolving
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
@@ -22,7 +25,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && profile && !allowedRoles.includes(profile.role)) {
+  // Superadmin bypasses all role restrictions on the frontend too
+  if (allowedRoles && profile?.role !== 'superadmin' && !allowedRoles.includes(profile?.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 
