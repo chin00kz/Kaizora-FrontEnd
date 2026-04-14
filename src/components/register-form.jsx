@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext"
 import { Loader2, ArrowLeft } from "lucide-react"
 
 // Assets
-import authBg from "/C:/Users/chinookz/.gemini/antigravity/brain/22ffc086-4a06-4e28-ae54-b99f38282661/fedex_light_bg_1776163689910.png"
+import authBg from "../assets/auth-bg.png"
 import logo from "../assets/logo.jpg"
 
 export function RegisterForm({
@@ -58,102 +58,106 @@ export function RegisterForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden border-slate-200 bg-white/95 backdrop-blur-sm shadow-2xl shadow-slate-200/50">
+      <Card className="overflow-hidden border-slate-200 bg-white shadow-2xl shadow-slate-200/50 rounded-3xl">
         <CardContent className="grid p-0 md:grid-cols-2">
-          {/* Side Banner */}
-          <div className="relative hidden bg-slate-50 md:block overflow-hidden border-r border-slate-100">
+          {/* Side Banner - Moved to Left for Registration to balance, but logo on the banner part */}
+          <div className="relative hidden md:flex flex-col items-center justify-center p-12 bg-slate-50 border-r border-slate-100">
             <img
               src={authBg}
-              alt="Kaizora Community"
-              className="absolute inset-0 h-full w-full object-cover opacity-80 scale-x-[-1]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/20 to-transparent"></div>
-            <div className="absolute bottom-10 left-8 right-8 z-20">
-              <p className="text-lg font-semibold text-slate-800 italic leading-relaxed">
-                &ldquo;Efficiency is doing things right; effectiveness is doing the right things.&rdquo;
-              </p>
-              <div className="w-12 h-1.5 bg-accent mt-4 rounded-full"></div>
+              className="absolute inset-0 h-full w-full object-cover opacity-90 scale-x-[-1]" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/90 via-white/40 to-transparent"></div>
+            
+            <div className="relative z-20 flex flex-col items-center text-center max-w-sm">
+              <div className="bg-white p-8 rounded-[2rem] shadow-2xl shadow-slate-200/50 mb-10 border border-white/50 animate-in zoom-in-95 duration-700">
+                <img src={logo} alt="FedEx Advantis" className="w-48 object-contain" />
+              </div>
+              
+              <div className="w-16 h-2 bg-primary rounded-full shadow-lg shadow-primary/20"></div>
             </div>
           </div>
 
-          <form onSubmit={handleRegister} className="p-6 md:p-8">
-            <div className="flex flex-col gap-5">
-              <div className="flex flex-col items-center text-center">
-                <img src={logo} alt="FedEx Advantis" className="w-40 mb-4 object-contain" />
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Join the Team</h1>
-                <p className="text-balance text-sm text-slate-500 mt-2">
-                  Create your account to start contributing
+          <form onSubmit={handleRegister} className="p-6 md:p-12 lg:p-16">
+            <div className="flex flex-col gap-8">
+              <div className="flex flex-col items-start gap-2">
+                <h1 className="text-4xl font-black tracking-tighter text-slate-900 leading-tight">
+                  KAI<span className="text-primary italic">ZORA</span>
+                </h1>
+                <p className="text-slate-500 text-sm font-medium">
+                  Join the Performance & Improvement Culture.
                 </p>
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-xs">
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-xs font-medium">
                   {error}
                 </div>
               )}
 
-              <div className="grid gap-2">
-                <Label htmlFor="fullName" className="text-slate-700 font-medium">Full Name</Label>
-                <Input 
-                  id="fullName" 
-                  name="fullName"
-                  type="text" 
-                  placeholder="John Doe" 
-                  required 
-                  className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-5">
                 <div className="grid gap-2">
-                  <Label htmlFor="email" className="text-slate-700 font-medium">Email</Label>
+                  <Label htmlFor="fullName" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Full Name</Label>
                   <Input 
-                    id="email" 
-                    name="email"
-                    type="email" 
-                    placeholder="m@company.com" 
-                    required 
-                    className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="department" className="text-slate-700 font-medium">Dept</Label>
-                  <Input 
-                    id="department" 
-                    name="department"
+                    id="fullName" 
+                    name="fullName"
                     type="text" 
-                    placeholder="IT / RD" 
+                    placeholder="John Doe" 
                     required 
-                    className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
-                    value={formData.department}
+                    className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Email</Label>
+                    <Input 
+                      id="email" 
+                      name="email"
+                      type="email" 
+                      placeholder="m@advantis.express" 
+                      required 
+                      className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
+                      value={formData.email}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="department" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Dept</Label>
+                    <Input 
+                      id="department" 
+                      name="department"
+                      type="text" 
+                      placeholder="IT / OPS" 
+                      required 
+                      className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
+                      value={formData.department}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="password" title="Password" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Password</Label>
+                  <Input 
+                    id="password" 
+                    name="password"
+                    type="password" 
+                    required 
+                    className="h-12 bg-slate-50 border-slate-200 text-slate-900 focus:border-primary focus:ring-primary/20 rounded-xl"
+                    value={formData.password}
                     onChange={handleChange}
                   />
                 </div>
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="password text-slate-700 font-medium">Password</Label>
-                <Input 
-                  id="password" 
-                  name="password"
-                  type="password" 
-                  required 
-                  className="bg-slate-50 border-slate-200 text-slate-900 focus:border-primary focus:ring-primary/20"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white font-semibold h-11 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] text-base">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Account"}
               </Button>
               
-              <div className="text-center text-sm text-slate-500 mt-2">
+              <div className="text-center text-sm font-medium text-slate-500 mt-2">
                 Already have an account?{" "}
-                <Link to="/login" className="text-primary hover:underline font-semibold underline-offset-4 flex items-center justify-center gap-1 mt-1">
+                <Link to="/login" className="text-primary hover:underline font-bold underline-offset-4 flex items-center justify-center gap-1 mt-1 transition-colors">
                   <ArrowLeft className="w-3 h-3" /> Log in
                 </Link>
               </div>
@@ -161,8 +165,8 @@ export function RegisterForm({
           </form>
         </CardContent>
       </Card>
-      <div className="text-balance text-center text-[10px] text-slate-400 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary leading-relaxed">
-        By signing up, you agree to optimize processes and drive continuous improvement within the FedEx ecosystem.
+      <div className="text-balance text-center text-[10px] text-slate-400 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary font-medium tracking-wide uppercase leading-relaxed">
+        By signing up, you agree to drive continuous improvement <br/> within the FedEx ecosystem.
       </div>
     </div>
   );
