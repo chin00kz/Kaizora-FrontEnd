@@ -3,10 +3,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select"
+import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
-import { Loader2, ArrowLeft } from "lucide-react"
+import { supabase } from "@/lib/supabase"
+import { Loader2, ArrowLeft, Building2 } from "lucide-react"
 
 // Assets
 import authBg from "../assets/auth-bg.png"
@@ -20,16 +28,43 @@ export function RegisterForm({
     email: '',
     password: '',
     fullName: '',
-    department: '',
+    username: '',
+    departmentId: '',
   })
+  const [departments, setDepartments] = useState([])
+  const [deptsLoading, setDeptsLoading] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   const { signUp } = useAuth()
   const navigate = useNavigate()
 
+  useEffect(() => {
+    async function fetchDepartments() {
+      try {
+        const { data, error } = await supabase
+          .from('departments')
+          .select('id, name')
+          .order('name', { ascending: true })
+        
+        if (error) throw error
+        setDepartments(data || [])
+      } catch (err) {
+        console.error('Error fetching departments:', err.message)
+      } finally {
+        setDeptsLoading(false)
+      }
+    }
+
+    fetchDepartments()
+  }, [])
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSelectChange = (value) => {
+    setFormData({ ...formData, departmentId: value })
   }
 
   const handleRegister = async (e) => {
@@ -43,7 +78,8 @@ export function RegisterForm({
       options: {
         data: {
           full_name: formData.fullName,
-          department: formData.department,
+          username: formData.username,
+          department_id: formData.departmentId,
         }
       }
     })
@@ -60,7 +96,7 @@ export function RegisterForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden border-slate-200 bg-white shadow-2xl shadow-slate-200/50 rounded-3xl">
         <CardContent className="grid p-0 md:grid-cols-2">
-          {/* Side Banner - Moved to Left for Registration to balance, but logo on the banner part */}
+          {/* Side Banner */}
           <div className="relative hidden md:flex flex-col items-center justify-center p-12 bg-slate-50 border-r border-slate-100">
             <img
               src={authBg}
@@ -108,33 +144,52 @@ export function RegisterForm({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="email" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="m@advantis.express"
-                      required
-                      className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
-                      value={formData.email}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="department" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Dept</Label>
-                    <Input
-                      id="department"
-                      name="department"
-                      type="text"
-                      placeholder="IT / OPS"
-                      required
-                      className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
-                      value={formData.department}
-                      onChange={handleChange}
-                    />
-                  </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="username" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Username</Label>
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="john_doe"
+                    required
+                    className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
+                    value={formData.username}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="email" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="name@fedexlk.com"
+                    required
+                    className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="departmentId" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Department</Label>
+                  <Select 
+                    onValueChange={handleSelectChange} 
+                    value={formData.departmentId}
+                    required
+                  >
+                    <SelectTrigger className="h-12 bg-slate-50 border-slate-200 text-slate-900 focus:border-primary focus:ring-primary/20 rounded-xl">
+                      <SelectValue placeholder={deptsLoading ? "Loading departments..." : "Select your department"} />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                      {departments.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.id} className="focus:bg-primary/5 focus:text-primary">
+                          {dept.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="grid gap-2">
@@ -151,7 +206,7 @@ export function RegisterForm({
                 </div>
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] text-base">
+              <Button type="submit" disabled={loading || deptsLoading} className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] text-base">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Account"}
               </Button>
 

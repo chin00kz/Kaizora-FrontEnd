@@ -3,7 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/api/client";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { 
+  Avatar, 
+  AvatarFallback, 
+  AvatarImage 
+} from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -176,18 +182,29 @@ export default function KaizenView() {
                   kaizen.comments?.map((comment) => {
                     const isMe = comment.user_id === profile?.id;
                     return (
-                      <div key={comment.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                        <div className={`max-w-[85%] p-4 rounded-2xl shadow-sm ${
-                          isMe ? 'bg-primary text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
-                        }`}>
-                          <p className={`text-xs font-black mb-1 opacity-70 ${!isMe && 'text-primary'}`}>
-                            {isMe ? 'You' : comment.profiles?.full_name || 'System User'}
-                          </p>
-                          <p className="text-sm font-medium whitespace-pre-wrap">{comment.content}</p>
+                      <div key={comment.id} className={`flex items-start gap-3 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                        <Avatar className="w-8 h-8 shrink-0 mt-1 border border-slate-200">
+                          <AvatarImage src={comment.profiles?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(comment.profiles?.email || comment.user_id)}`} />
+                          <AvatarFallback className={cn(
+                            "text-[10px] font-black",
+                            isMe ? "bg-primary/20 text-primary" : "bg-slate-200 text-slate-600"
+                          )}>
+                            {(comment.profiles?.full_name || 'U').charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[80%]`}>
+                          <div className={`p-4 rounded-2xl shadow-sm ${
+                            isMe ? 'bg-primary text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
+                          }`}>
+                            <p className={`text-xs font-black mb-1 opacity-70 ${!isMe && 'text-primary'}`}>
+                              {isMe ? 'You' : comment.profiles?.full_name || 'System User'}
+                            </p>
+                            <p className="text-sm font-medium whitespace-pre-wrap">{comment.content}</p>
+                          </div>
+                          <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest px-1">
+                            {new Date(comment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
                         </div>
-                        <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest px-1">
-                          {new Date(comment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
                       </div>
                     );
                   })
@@ -227,9 +244,12 @@ export default function KaizenView() {
             </CardHeader>
             <CardContent className="p-6 pt-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-slate-100 border-2 border-white shadow-sm flex items-center justify-center text-slate-600 font-black text-lg">
-                  {kaizen.submitter?.full_name?.charAt(0) || '?'}
-                </div>
+                <Avatar className="w-12 h-12 border-2 border-white shadow-sm">
+                  <AvatarImage src={kaizen.submitter?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(kaizen.submitter?.email || 'submitter')}`} />
+                  <AvatarFallback className="bg-slate-100 font-black text-lg text-slate-600">
+                    {kaizen.submitter?.full_name?.charAt(0) || '?'}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
                   <h3 className="font-bold text-slate-900">{kaizen.submitter?.full_name || 'Unknown User'}</h3>
                   <p className="text-xs font-bold text-slate-500">{kaizen.departments?.name || 'No Dept'}</p>
@@ -322,9 +342,12 @@ export default function KaizenView() {
               </CardHeader>
               <CardContent className="p-6 pt-4 pb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-black text-xs">
-                    {kaizen.reviewer?.full_name?.charAt(0) || '?'}
-                  </div>
+                  <Avatar className="w-8 h-8 border border-slate-200">
+                    <AvatarImage src={kaizen.reviewer?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(kaizen.reviewer?.email || 'reviewer')}`} />
+                    <AvatarFallback className="bg-slate-800 text-white font-black text-xs">
+                      {kaizen.reviewer?.full_name?.charAt(0) || '?'}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <h3 className="font-bold text-slate-900 text-sm">{kaizen.reviewer.full_name}</h3>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{new Date(kaizen.updated_at).toLocaleDateString()}</p>

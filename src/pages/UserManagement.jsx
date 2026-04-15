@@ -2,14 +2,6 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/api/client";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -26,30 +18,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Users, 
   UserPlus, 
   Shield, 
-  Building, 
-  Search, 
-  MoreHorizontal,
-  Ban,
-  Trash2,
-  BarChart3,
+  Ban, 
   Loader2,
-  CheckCircle2,
-  XCircle
+  UserCheck
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// New Data Table Components
+import { DataTable } from "@/components/DataTable";
+import { columns } from "./user-columns";
 
 export default function UserManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [createFormData, setCreateFormData] = useState({
     full_name: "",
@@ -112,6 +100,27 @@ export default function UserManagement() {
     },
   });
 
+  const approveMutation = useMutation({
+    mutationFn: ({ userId, isApproved }) => api.patch(`/users/${userId}/approve`, { is_approved: isApproved }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(["users"]);
+      toast({ 
+        title: variables.isApproved ? "✅ User Approved" : "User access revoked",
+        description: variables.isApproved ? "The user can now log in to the platform." : "The user has been set to pending."
+      });
+    },
+    onError: (err) => toast({ title: "Error", description: err.message, variant: "destructive" }),
+  });
+
+  const bulkApproveMutation = useMutation({
+    mutationFn: (userIds) => Promise.all(userIds.map(id => api.patch(`/users/${id}/approve`, { is_approved: true }))),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]);
+      toast({ title: "✅ Users Approved", description: "All selected users have been activated." });
+    },
+    onError: (err) => toast({ title: "Bulk Approval Error", description: err.message, variant: "destructive" }),
+  });
+
   const [selectedUserStats, setSelectedUserStats] = useState(null);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
 
@@ -128,17 +137,22 @@ export default function UserManagement() {
     }
   };
 
-  // Filtered Users
-  const filteredUsers = usersData?.filter(u => 
-    u.full_name?.toLowerCase().includes(search.toLowerCase()) || 
-    u.email?.toLowerCase().includes(search.toLowerCase())
-  );
-
   const stats = {
     total: usersData?.length || 0,
+    pending: usersData?.filter(u => !u.is_approved).length || 0,
     banned: usersData?.filter(u => u.is_banned).length || 0,
     superadmins: usersData?.filter(u => u.role === 'superadmin').length || 0,
   };
+
+  // Generate Table Columns
+  const userColumns = columns(
+    deptsData, 
+    updateRoleMutation, 
+    updateDeptMutation, 
+    approveMutation, 
+    toggleBanMutation, 
+    fetchUserStats
+  );
 
   if (usersLoading) return (
     <div className="flex items-center justify-center p-20">
@@ -176,10 +190,11 @@ export default function UserManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => setIsStatsModalOpen(false)} className="w-full font-bold">Close Hub</Button>
+            <Button onClick={() => setIsStatsModalOpen(false)} className="w-full font-bold text-white bg-primary rounded-xl">Close Hub</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       {/* Header & Stats */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -203,7 +218,6 @@ export default function UserManagement() {
             </DialogHeader>
             <form onSubmit={(e) => {
               e.preventDefault();
-              // Clean up department_id if no_dept
               const submissionData = { ...createFormData };
               if (submissionData.department_id === "no_dept") {
                 submissionData.department_id = null;
@@ -218,6 +232,7 @@ export default function UserManagement() {
                   onChange={(e) => setCreateFormData({...createFormData, full_name: e.target.value})}
                   placeholder="John Doe" 
                   required 
+                  className="rounded-xl border-slate-200"
                 />
               </div>
               <div className="grid gap-2">
@@ -227,8 +242,9 @@ export default function UserManagement() {
                   type="email" 
                   value={createFormData.email}
                   onChange={(e) => setCreateFormData({...createFormData, email: e.target.value})}
-                  placeholder="john@advantis.express" 
+                  placeholder="name@fedexlk.com" 
                   required 
+                  className="rounded-xl border-slate-200"
                 />
               </div>
               <div className="grid gap-2">
@@ -240,6 +256,7 @@ export default function UserManagement() {
                   onChange={(e) => setCreateFormData({...createFormData, password: e.target.value})}
                   placeholder="••••••••"
                   required 
+                  className="rounded-xl border-slate-200"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -249,7 +266,7 @@ export default function UserManagement() {
                     value={createFormData.role}
                     onValueChange={(val) => setCreateFormData({...createFormData, role: val})}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="rounded-xl border-slate-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -262,43 +279,24 @@ export default function UserManagement() {
                 </div>
                 <div className="grid gap-2">
                   <Label>Department</Label>
-                  {deptsData?.length > 0 ? (
-                    <Select 
-                      value={createFormData.department_id}
-                      onValueChange={(val) => setCreateFormData({...createFormData, department_id: val})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="no_dept">None (Standalone)</SelectItem>
-                        {deptsData.map(d => (
-                          <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      <p className="text-[10px] text-amber-600 font-bold bg-amber-50 p-2 rounded border border-amber-100 italic">
-                        No departments found. Create one first!
-                      </p>
-                      <Button 
-                        variant="link" 
-                        size="sm" 
-                        className="h-auto p-0 text-xs font-bold text-primary underline justify-start"
-                        onClick={() => {
-                          setIsCreateModalOpen(false);
-                          window.location.href = "/department";
-                        }}
-                      >
-                        Manage Departments ➔
-                      </Button>
-                    </div>
-                  )}
+                  <Select 
+                    value={createFormData.department_id}
+                    onValueChange={(val) => setCreateFormData({...createFormData, department_id: val})}
+                  >
+                    <SelectTrigger className="rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="no_dept">None (Standalone)</SelectItem>
+                      {deptsData?.map(d => (
+                        <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <DialogFooter className="mt-6">
-                <Button type="submit" disabled={createUserMutation.isLoading} className="w-full font-bold">
+                <Button type="submit" disabled={createUserMutation.isLoading} className="w-full font-bold rounded-xl bg-primary text-white">
                   {createUserMutation.isLoading ? <Loader2 className="animate-spin" /> : "Create Identity"}
                 </Button>
               </DialogFooter>
@@ -307,8 +305,9 @@ export default function UserManagement() {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-slate-200 shadow-sm rounded-2xl">
+      {/* Stats Dashboard */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
               <Users className="w-6 h-6 text-primary" />
@@ -319,7 +318,18 @@ export default function UserManagement() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-slate-200 shadow-sm rounded-2xl">
+        <Card className="border-amber-100 shadow-sm rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+              <UserCheck className="w-6 h-6 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider leading-none mb-1">Pending Approval</p>
+              <h3 className="text-2xl font-black text-slate-900">{stats.pending}</h3>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-red-100 shadow-sm rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
               <Ban className="w-6 h-6 text-red-600" />
@@ -330,7 +340,7 @@ export default function UserManagement() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-slate-200 shadow-sm rounded-2xl">
+        <Card className="border-accent/20 shadow-sm rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
               <Shield className="w-6 h-6 text-accent" />
@@ -343,117 +353,18 @@ export default function UserManagement() {
         </Card>
       </div>
 
-      {/* User Table Card */}
-      <Card className="border-slate-200 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
+      {/* Identity Directory Card */}
+      <Card className="border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] overflow-hidden bg-white">
         <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-8 py-6">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-bold text-slate-800">Identity Directory</CardTitle>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input 
-                placeholder="Search users..." 
-                className="pl-9 h-10 bg-white border-slate-200 rounded-xl"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-          </div>
+          <CardTitle className="text-xl font-black text-slate-800 tracking-tight">Identity Directory</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-slate-50/30">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="px-8 font-bold text-slate-700 uppercase text-[10px] tracking-widest">Identity</TableHead>
-                <TableHead className="font-bold text-slate-700 uppercase text-[10px] tracking-widest">Role</TableHead>
-                <TableHead className="font-bold text-slate-700 uppercase text-[10px] tracking-widest">Department</TableHead>
-                <TableHead className="font-bold text-slate-700 uppercase text-[10px] tracking-widest">Status</TableHead>
-                <TableHead className="text-right px-8 font-bold text-slate-700 uppercase text-[10px] tracking-widest">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers?.map((user) => (
-                <TableRow key={user.id} className="group hover:bg-slate-50/50 transition-colors border-slate-100">
-                  <TableCell className="px-8 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600 text-sm border border-slate-200">
-                        {user.full_name?.charAt(0) || user.email?.charAt(0)}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 leading-none">{user.full_name}</span>
-                        <span className="text-xs text-slate-500 mt-1">{user.email}</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Select 
-                      disabled={user.role === 'superadmin' || updateRoleMutation.isLoading}
-                      defaultValue={user.role} 
-                      onValueChange={(role) => updateRoleMutation.mutate({ userId: user.id, role })}
-                    >
-                      <SelectTrigger className="w-32 h-8 text-[11px] font-bold uppercase tracking-wider rounded-lg">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="employee">Staff</SelectItem>
-                        <SelectItem value="qdm">QDM Team</SelectItem>
-                        <SelectItem value="hod">HOD</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Select 
-                      disabled={user.role === 'superadmin' || updateDeptMutation.isLoading}
-                      defaultValue={user.department_id} 
-                      onValueChange={( विभागId ) => updateDeptMutation.mutate({ userId: user.id, departmentId: विभागId })}
-                    >
-                      <SelectTrigger className="w-32 h-8 text-[11px] font-medium rounded-lg">
-                        <SelectValue placeholder="No Dept" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="no_dept">None</SelectItem>
-                        {deptsData?.map(d => (
-                          <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    {user.is_banned ? (
-                      <Badge variant="destructive" className="bg-red-50 text-red-600 border-red-200 hover:bg-red-50 font-bold px-3 py-1 rounded-full text-[10px]">
-                        Banned
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 hover:bg-green-50 font-bold px-3 py-1 rounded-full text-[10px]">
-                        Active
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right px-8">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => fetchUserStats(user.id)}
-                        className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/5"
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        disabled={user.role === 'superadmin'}
-                        onClick={() => toggleBanMutation.mutate({ userId: user.id, isBanned: user.is_banned })}
-                        className={`h-8 w-8 transition-colors ${user.is_banned ? "text-green-500 hover:bg-green-50" : "text-slate-400 hover:text-red-500 hover:bg-red-50"}`}
-                      >
-                        {user.is_banned ? <CheckCircle2 className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <DataTable 
+            columns={userColumns} 
+            data={usersData || []} 
+            searchPlaceholder="Filter identities..."
+            onBulkApprove={(userIds) => bulkApproveMutation.mutate(userIds)}
+          />
         </CardContent>
       </Card>
     </div>

@@ -102,7 +102,7 @@ export function LoginForm({
                   <Input 
                     id="email" 
                     type="email" 
-                    placeholder="name@advantis.express" 
+                    placeholder="name@fedexlk.com" 
                     required 
                     className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
                     value={email}

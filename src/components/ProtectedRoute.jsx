@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 /**
- * Protects routes based on auth state and role.
+ * Protects routes based on auth state, approval status, and role.
  * Superadmin always bypasses role checks.
  */
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -23,6 +23,14 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // If profile is loaded and user is not approved, send to pending screen
+  // (Superadmin is always approved)
+  if (profile && profile.role !== 'superadmin' && !profile.is_approved) {
+    if (location.pathname !== '/pending-approval') {
+      return <Navigate to="/pending-approval" replace />;
+    }
   }
 
   // Superadmin bypasses all role restrictions on the frontend too

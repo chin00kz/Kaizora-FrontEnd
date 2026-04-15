@@ -3,6 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import api from "@/api/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
+  Avatar, 
+  AvatarFallback, 
+  AvatarImage 
+} from "@/components/ui/avatar";
+import { 
   BarChart3, 
   FileText, 
   CheckCircle2, 
@@ -115,10 +120,13 @@ export default function Dashboard() {
             ) : (
               <div className="divide-y divide-slate-100">
                 {kaizens?.slice(0, 5).map((kaizen) => (
-                  <div key={kaizen.id} className="p-6 hover:bg-slate-50/50 transition-all flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200 flex-shrink-0">
-                      <Lightbulb className="w-5 h-5 text-slate-400" />
-                    </div>
+                  <div key={kaizen.id} className="p-6 hover:bg-slate-50/50 transition-all flex items-start gap-4 cursor-pointer" onClick={() => navigate(`/kaizen/${kaizen.id}`)}>
+                    <Avatar className="w-10 h-10 border border-slate-200 shadow-sm rounded-xl">
+                      <AvatarImage src={kaizen.profiles?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(kaizen.profiles?.email || kaizen.submitted_by)}`} />
+                      <AvatarFallback className="bg-slate-100 font-bold text-slate-500 text-xs">
+                        {kaizen.profiles?.full_name?.charAt(0) || '?'}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="flex-1 min-w-0">
                       <h4 className="font-bold text-slate-900 truncate">{kaizen.title}</h4>
                       <p className="text-xs text-slate-500 mt-1 line-clamp-1">{kaizen.description}</p>

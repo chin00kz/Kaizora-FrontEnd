@@ -1,5 +1,7 @@
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { toast } from '@/hooks/use-toast';
 
 // Auth Components
 import Login from './pages/Login';
@@ -11,6 +13,7 @@ import SubmitKaizen from './pages/SubmitKaizen';
 import MyKaizens from './pages/MyKaizens';
 import KaizenView from './pages/KaizenView';
 import QDMPortal from './pages/QDMPortal';
+import PendingApproval from './pages/PendingApproval';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import { Toaster } from "@/components/ui/toaster"
@@ -44,6 +47,19 @@ const SuperAdminPanel = () => (
 const queryClient = new QueryClient();
 
 function App() {
+  useEffect(() => {
+    const handleApiOffline = (e) => {
+      toast({
+        title: "Connection Error",
+        description: e.detail?.message || "Cannot connect to the server. Some features may be unavailable.",
+        variant: "destructive",
+      });
+    };
+    
+    window.addEventListener('api-offline', handleApiOffline);
+    return () => window.removeEventListener('api-offline', handleApiOffline);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
@@ -51,6 +67,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/pending-approval" element={<PendingApproval />} />
 
           {/* Protected Routes */}
           <Route path="/" element={

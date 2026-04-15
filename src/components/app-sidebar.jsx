@@ -17,6 +17,11 @@ import {
 
 import { useAuth } from "../context/AuthContext"
 import { cn } from "../lib/utils"
+import { 
+  Avatar, 
+  AvatarFallback, 
+  AvatarImage 
+} from "./ui/avatar"
 import {
   Sidebar,
   SidebarContent,
@@ -178,14 +183,15 @@ export function AppSidebar({ ...props }) {
                   size="lg"
                   className="w-full data-[state=open]:bg-slate-200 rounded-xl transition-colors bg-white/50 border border-slate-100"
                 >
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center font-bold border text-xs uppercase flex-shrink-0",
-                    profile?.role === 'superadmin'
-                      ? 'bg-accent/20 text-accent border-accent/20'
-                      : 'bg-primary/20 text-primary border-primary/20'
-                  )}>
-                    {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || 'U'}
-                  </div>
+                  <Avatar className="w-8 h-8 border border-slate-200 shadow-sm">
+                    <AvatarImage src={profile?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(profile?.email || 'user')}`} />
+                    <AvatarFallback className={cn(
+                      "font-bold text-xs uppercase",
+                      profile?.role === 'superadmin' ? 'bg-accent/20 text-accent' : 'bg-primary/20 text-primary'
+                    )}>
+                      {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
                   {state !== "collapsed" && (
                     <div className="flex flex-1 flex-col items-start text-sm overflow-hidden animate-in fade-in duration-300">
                       <span className="font-semibold text-slate-900 truncate w-full leading-none mb-1">
@@ -211,7 +217,7 @@ export function AppSidebar({ ...props }) {
                   <Settings className="mr-2 w-4 h-4" />
                   <span>Profile Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={signOut}
                   className="focus:bg-red-50 text-red-600 rounded-lg cursor-pointer"
                 >
