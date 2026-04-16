@@ -154,16 +154,19 @@ export function AppSidebar({ ...props }) {
                   tooltip={item.title}
                   isActive={isActive}
                   className={cn(
-                    "transition-all duration-200 py-6 px-4 rounded-xl",
+                    "transition-all duration-200 py-6 px-4 rounded-xl relative",
                     isActive
                       ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
-                      : "text-slate-500 hover:bg-slate-200/50 hover:text-slate-900"
+                      : "text-slate-600 hover:bg-slate-200/50 hover:text-slate-900"
                   )}
                 >
                   <Link to={item.url}>
+                    {isActive && (
+                      <span className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-primary rounded-r-full animate-in fade-in slide-in-from-left-1 duration-300" />
+                    )}
                     <Icon className={cn(
-                      "w-5 h-5",
-                      isActive ? "text-primary" : "text-slate-400 group-hover:text-slate-600"
+                      "w-5 h-5 transition-colors",
+                      isActive ? "text-primary" : "text-slate-500 group-hover:text-slate-700"
                     )} />
                     <span>{item.title}</span>
                   </Link>
