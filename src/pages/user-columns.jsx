@@ -10,12 +10,23 @@ import {
   BarChart3, 
   CheckCircle2, 
   Ban, 
-  UserCheck, 
   UserX,
-  ArrowUpDown
+  ArrowUpDown,
+  MoreHorizontal,
+  Edit,
+  Key,
+  Trash2
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const columns = (
   deptsData, 
@@ -23,7 +34,10 @@ export const columns = (
   updateDeptMutation, 
   approveMutation, 
   toggleBanMutation, 
-  fetchUserStats
+  fetchUserStats,
+  onEditUser,
+  onResetPassword,
+  onDeleteUser
 ) => [
   {
     id: "select",
@@ -161,18 +175,7 @@ export const columns = (
     cell: ({ row }) => {
       const user = row.original;
       return (
-        <div className="flex items-center justify-end gap-6 pr-4">
-          <div className="flex items-center gap-2">
-            <span className={`text-[10px] font-bold uppercase tracking-wider ${user.is_banned ? 'text-red-500' : 'text-slate-400'}`}>
-              Ban
-            </span>
-            <Switch 
-              disabled={user.role === 'superadmin' || toggleBanMutation.isLoading}
-              checked={user.is_banned}
-              onCheckedChange={() => toggleBanMutation.mutate({ userId: user.id, isBanned: user.is_banned })}
-              className="data-[state=checked]:bg-red-500 scale-90"
-            />
-          </div>
+        <div className="flex items-center justify-end gap-3 pr-4">
           <Button 
             variant="ghost" 
             size="icon" 
@@ -180,8 +183,54 @@ export const columns = (
             className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/5"
             title="User Performance"
           >
-            <BarChart3 className="w-5 h-5" />
+            <BarChart3 className="w-4 h-4" />
           </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-lg border-slate-100">
+              <DropdownMenuLabel className="font-black text-xs uppercase tracking-widest text-slate-400">Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-slate-100" />
+              
+              <DropdownMenuItem onClick={() => onEditUser(user)} className="cursor-pointer font-bold focus:bg-slate-50 focus:text-primary">
+                <Edit className="mr-2 h-4 w-4" />
+                <span>Edit Profile</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => onResetPassword(user)} className="cursor-pointer font-bold focus:bg-slate-50 focus:text-primary">
+                <Key className="mr-2 h-4 w-4" />
+                <span>Reset Password</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="bg-slate-100" />
+
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleBanMutation.mutate({ userId: user.id, isBanned: user.is_banned });
+                }} 
+                disabled={user.role === 'superadmin' || toggleBanMutation.isLoading}
+                className={`cursor-pointer font-bold ${user.is_banned ? 'focus:bg-green-50 focus:text-green-600 text-green-600' : 'focus:bg-orange-50 focus:text-orange-600 text-orange-600'}`}
+              >
+                <Ban className="mr-2 h-4 w-4" />
+                <span>{user.is_banned ? 'Unban User' : 'Ban User'}</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem 
+                onClick={() => onDeleteUser(user)}
+                disabled={user.role === 'superadmin'}
+                className="cursor-pointer font-black text-red-600 focus:bg-red-50 focus:text-red-700 mt-1"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                <span>Delete Account</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       );
     },

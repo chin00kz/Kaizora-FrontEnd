@@ -12,6 +12,7 @@ import DepartmentManagement from './pages/DepartmentManagement';
 import SubmitKaizen from './pages/SubmitKaizen';
 import MyKaizens from './pages/MyKaizens';
 import KaizenView from './pages/KaizenView';
+import Profile from './pages/Profile';
 import QDMPortal from './pages/QDMPortal';
 import PendingApproval from './pages/PendingApproval';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -106,6 +107,14 @@ function App() {
             <ProtectedRoute>
               <MainLayout>
                 <KaizenView />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Profile />
               </MainLayout>
             </ProtectedRoute>
           } />

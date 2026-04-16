@@ -46,6 +46,15 @@ export default function UserManagement() {
     role: "employee",
     department_id: "no_dept"
   });
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({ id: "", full_name: "", email: "" });
+
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [resetFormData, setResetFormData] = useState({ id: "", password: "" });
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   
   // Queries
   const { data: usersData, isLoading: usersLoading } = useQuery({
@@ -121,6 +130,50 @@ export default function UserManagement() {
     onError: (err) => toast({ title: "Bulk Approval Error", description: err.message, variant: "destructive" }),
   });
 
+  const editUserMutation = useMutation({
+    mutationFn: (data) => api.patch(`/users/${data.id}/details`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]);
+      setIsEditModalOpen(false);
+      toast({ title: "User updated successfully" });
+    },
+    onError: (err) => toast({ title: "Update Failed", description: err.message, variant: "destructive" }),
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: (data) => api.patch(`/users/${data.id}/reset-password`, data),
+    onSuccess: () => {
+      setIsResetModalOpen(false);
+      toast({ title: "Password reset successfully" });
+    },
+    onError: (err) => toast({ title: "Reset Failed", description: err.message, variant: "destructive" }),
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId) => api.delete(`/users/${userId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]);
+      setIsDeleteModalOpen(false);
+      toast({ title: "User deleted successfully" });
+    },
+    onError: (err) => toast({ title: "Deletion Failed", description: err.message, variant: "destructive" }),
+  });
+
+  const handleEditUser = (user) => {
+    setEditFormData({ id: user.id, full_name: user.full_name, email: user.email });
+    setIsEditModalOpen(true);
+  };
+
+  const handleResetPassword = (user) => {
+    setResetFormData({ id: user.id, password: "" });
+    setIsResetModalOpen(true);
+  };
+
+  const handleDeleteUser = (user) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  };
+
   const [selectedUserStats, setSelectedUserStats] = useState(null);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
 
@@ -151,7 +204,10 @@ export default function UserManagement() {
     updateDeptMutation, 
     approveMutation, 
     toggleBanMutation, 
-    fetchUserStats
+    fetchUserStats,
+    handleEditUser,
+    handleResetPassword,
+    handleDeleteUser
   );
 
   if (usersLoading) return (
@@ -304,6 +360,99 @@ export default function UserManagement() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Edit User Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black tracking-tight">Edit Identity</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            editUserMutation.mutate(editFormData);
+          }} className="space-y-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="edit_name">Full Name</Label>
+              <Input 
+                id="edit_name" 
+                value={editFormData.full_name}
+                onChange={(e) => setEditFormData({...editFormData, full_name: e.target.value})}
+                required 
+                className="rounded-xl border-slate-200"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit_email">Email</Label>
+              <Input 
+                id="edit_email" 
+                type="email" 
+                value={editFormData.email}
+                onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
+                required 
+                className="rounded-xl border-slate-200"
+              />
+            </div>
+            <DialogFooter className="mt-6">
+              <Button type="submit" disabled={editUserMutation.isLoading} className="w-full font-bold rounded-xl bg-primary text-white">
+                {editUserMutation.isLoading ? <Loader2 className="animate-spin" /> : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Modal */}
+      <Dialog open={isResetModalOpen} onOpenChange={setIsResetModalOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black tracking-tight">Reset Password</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            resetPasswordMutation.mutate(resetFormData);
+          }} className="space-y-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="new_password">New Password</Label>
+              <Input 
+                id="new_password" 
+                type="password" 
+                value={resetFormData.password}
+                onChange={(e) => setResetFormData({...resetFormData, password: e.target.value})}
+                required 
+                placeholder="••••••••"
+                className="rounded-xl border-slate-200"
+              />
+            </div>
+            <DialogFooter className="mt-6">
+              <Button type="submit" disabled={resetPasswordMutation.isLoading} className="w-full font-bold rounded-xl bg-primary text-white">
+                {resetPasswordMutation.isLoading ? <Loader2 className="animate-spin" /> : "Reset Password"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-red-600 tracking-tight">Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete {userToDelete?.full_name}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6">
+            <Button variant="ghost" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>
+            <Button 
+              onClick={() => deleteUserMutation.mutate(userToDelete.id)} 
+              disabled={deleteUserMutation.isLoading} 
+              className="bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl"
+            >
+              {deleteUserMutation.isLoading ? <Loader2 className="animate-spin" /> : "Yes, Delete User"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Stats Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

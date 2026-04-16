@@ -15,6 +15,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
@@ -25,7 +33,8 @@ import {
   Send,
   Loader2,
   Award,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from "lucide-react";
 
 function getStatusColor(status) {
@@ -49,6 +58,7 @@ export default function KaizenView() {
   const [score, setScore] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Queries
   const { data: kaizen, isLoading } = useQuery({
@@ -77,6 +87,17 @@ export default function KaizenView() {
     onError: (err) => toast({ title: "Failed to post message", description: err.message, variant: "destructive" }),
   });
 
+  const deleteKaizenMutation = useMutation({
+    mutationFn: () => api.delete(`/kaizens/${kaizenId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["kaizens"]);
+      setIsDeleteModalOpen(false);
+      toast({ title: "Kaizen deleted successfully" });
+      navigate("/dashboard");
+    },
+    onError: (err) => toast({ title: "Failed to delete Kaizen", description: err.message, variant: "destructive" }),
+  });
+
   if (isLoading) return (
     <div className="flex items-center justify-center p-20">
       <Loader2 className="w-10 h-10 animate-spin text-primary" />
@@ -88,6 +109,7 @@ export default function KaizenView() {
   );
 
   const isReviewer = ['qdm', 'hod', 'admin', 'superadmin'].includes(profile?.role);
+  const isAdmin = ['admin', 'superadmin'].includes(profile?.role);
   const canEvaluate = isReviewer && kaizen.status === 'pending';
 
   const handleApprove = () => {
@@ -110,16 +132,28 @@ export default function KaizenView() {
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full bg-white shadow-sm border border-slate-200">
-          <ArrowLeft className="w-4 h-4 text-slate-500" />
-        </Button>
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className={`font-black uppercase tracking-wider px-3 py-1 text-xs rounded-full ${getStatusColor(kaizen.status)}`}>
-            {kaizen.status}
-          </Badge>
-          <span className="text-sm font-bold text-slate-400">REF: #{kaizen.id.split('-')[0].toUpperCase()}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full bg-white shadow-sm border border-slate-200">
+            <ArrowLeft className="w-4 h-4 text-slate-500" />
+          </Button>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className={`font-black uppercase tracking-wider px-3 py-1 text-xs rounded-full ${getStatusColor(kaizen.status)}`}>
+              {kaizen.status}
+            </Badge>
+            <span className="text-sm font-bold text-slate-400">REF: #{kaizen.id.split('-')[0].toUpperCase()}</span>
+          </div>
         </div>
+        {isAdmin && (
+          <Button 
+            variant="ghost" 
+            className="text-red-500 hover:text-red-700 hover:bg-red-50 font-bold"
+            onClick={() => setIsDeleteModalOpen(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete Kaizen
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -358,6 +392,28 @@ export default function KaizenView() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-red-600 tracking-tight">Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete this Kaizen? All associated discussion threads and evaluations will be lost. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6">
+            <Button variant="ghost" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>
+            <Button 
+              onClick={() => deleteKaizenMutation.mutate()} 
+              disabled={deleteKaizenMutation.isLoading} 
+              className="bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl"
+            >
+              {deleteKaizenMutation.isLoading ? <Loader2 className="animate-spin" /> : "Yes, Delete Kaizen"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -42,8 +42,13 @@ import {
 
 // Assets
 import logo from "../assets/logo.jpg"
-
 const menuItems = [
+  {
+    title: "My Profile",
+    icon: User,
+    url: "/profile",
+    roles: ["employee", "qdm", "hod", "admin", "superadmin"],
+  },
   {
     title: "Dashboard",
     icon: LayoutDashboard,
@@ -216,9 +221,11 @@ export function AppSidebar({ ...props }) {
                 align="end"
                 className="w-56 bg-white border-slate-200 text-slate-700 rounded-xl p-1 shadow-xl shadow-slate-200/50"
               >
-                <DropdownMenuItem className="focus:bg-slate-100 focus:text-slate-900 rounded-lg cursor-pointer">
-                  <Settings className="mr-2 w-4 h-4" />
-                  <span>Profile Settings</span>
+                <DropdownMenuItem asChild className="focus:bg-slate-100 focus:text-slate-900 rounded-lg cursor-pointer">
+                  <Link to="/profile" className="flex w-full">
+                    <Settings className="mr-2 w-4 h-4" />
+                    <span>Profile Settings</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={signOut}
