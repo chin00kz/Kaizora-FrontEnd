@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Shield, User, Lock, Save, LayoutTemplate } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import superadminAvatar from "../assets/superadmin.jpg";
 
 export default function Profile() {
   const { user, profile, refreshProfile } = useAuth();
@@ -33,7 +32,7 @@ export default function Profile() {
     queryKey: ['departments'],
     queryFn: () => api.get('/departments').then(res => res.data.data.departments || []),
   });
-  
+
   const deptName = departments?.find(d => d.id === profile?.department_id)?.name || profile?.department_id || "Unassigned";
 
   const updateProfileMutation = useMutation({
@@ -53,7 +52,7 @@ export default function Profile() {
       toast({ title: "Passwords don't match", variant: "destructive" });
       return;
     }
-    
+
     setIsChangingPassword(true);
     try {
       // Re-verify Old Password by attempting sign in
@@ -69,7 +68,7 @@ export default function Profile() {
       });
 
       if (updateError) throw updateError;
-      
+
       toast({ title: "Password changed successfully" });
       setOldPassword("");
       setNewPassword("");
@@ -91,13 +90,13 @@ export default function Profile() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        
+
         {/* Left Column - Identity preview */}
         <div className="lg:col-span-1 space-y-6">
           <Card className="border-slate-100 shadow-sm rounded-3xl overflow-hidden bg-white/60 backdrop-blur-xl text-center">
             <CardContent className="p-6 pt-10 flex flex-col items-center">
               <Avatar className="w-28 h-28 border-4 border-white shadow-xl shadow-slate-200/50 mb-5 relative">
-                <AvatarImage src={profile.role === 'superadmin' ? superadminAvatar : `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user?.email || '')}`} className="bg-slate-50 object-cover" />
+                <AvatarImage src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user?.email || '')}`} className="bg-slate-50" />
                 <AvatarFallback className="bg-primary/10 text-primary font-black text-3xl">
                   {profile.full_name?.charAt(0) || 'U'}
                 </AvatarFallback>
@@ -113,7 +112,7 @@ export default function Profile() {
 
         {/* Right Column - Forms */}
         <div className="lg:col-span-3 space-y-6">
-          
+
           <Card className="border-slate-100 shadow-md shadow-slate-200/30 rounded-3xl overflow-hidden bg-white">
             <CardHeader className="border-b border-slate-50 bg-slate-50/30 p-6 flex flex-row items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -125,7 +124,7 @@ export default function Profile() {
               </div>
             </CardHeader>
             <CardContent className="p-6 md:p-8">
-              <form 
+              <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   updateProfileMutation.mutate({ full_name: fullName });
@@ -148,7 +147,7 @@ export default function Profile() {
 
                 <div className="grid gap-2 pt-2">
                   <Label htmlFor="full_name" className="text-slate-600 font-semibold px-1">Full Legal Name</Label>
-                  <Input 
+                  <Input
                     id="full_name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -182,7 +181,7 @@ export default function Profile() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="grid gap-2">
                     <Label htmlFor="old_pw" className="text-slate-600 font-semibold px-1">Current Password</Label>
-                    <Input 
+                    <Input
                       id="old_pw"
                       type="password"
                       value={oldPassword}
@@ -193,10 +192,10 @@ export default function Profile() {
                     />
                   </div>
                   <div className="hidden md:block"></div> {/* Spacer */}
-                  
+
                   <div className="grid gap-2">
                     <Label htmlFor="new_pw" className="text-slate-600 font-semibold px-1">New Password</Label>
-                    <Input 
+                    <Input
                       id="new_pw"
                       type="password"
                       value={newPassword}
@@ -208,7 +207,7 @@ export default function Profile() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="c_pw" className="text-slate-600 font-semibold px-1">Confirm New Password</Label>
-                    <Input 
+                    <Input
                       id="c_pw"
                       type="password"
                       value={confirmPassword}
@@ -219,7 +218,7 @@ export default function Profile() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="pt-4 flex justify-end">
                   <Button disabled={isChangingPassword} type="submit" variant="outline" className="w-full sm:w-auto h-11 px-8 font-bold rounded-xl border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700 transition-all">
                     {isChangingPassword ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <Lock className="mr-2 w-4 h-4" />}

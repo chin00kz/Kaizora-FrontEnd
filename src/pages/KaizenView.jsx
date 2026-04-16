@@ -5,10 +5,10 @@ import api from "@/api/client";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { 
-  Avatar, 
-  AvatarFallback, 
-  AvatarImage 
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,12 +24,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  ArrowLeft, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  MessageSquare, 
+import {
+  ArrowLeft,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  MessageSquare,
   Send,
   Loader2,
   Award,
@@ -53,7 +53,7 @@ export default function KaizenView() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { profile } = useAuth();
-  
+
   const [commentText, setCommentText] = useState("");
   const [score, setScore] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
@@ -145,8 +145,8 @@ export default function KaizenView() {
           </div>
         </div>
         {isAdmin && (
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="text-red-500 hover:text-red-700 hover:bg-red-50 font-bold"
             onClick={() => setIsDeleteModalOpen(true)}
           >
@@ -157,7 +157,7 @@ export default function KaizenView() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Main Content Column */}
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-slate-200 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden">
@@ -227,9 +227,8 @@ export default function KaizenView() {
                           </AvatarFallback>
                         </Avatar>
                         <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[80%]`}>
-                          <div className={`p-4 rounded-2xl shadow-sm ${
-                            isMe ? 'bg-primary text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
-                          }`}>
+                          <div className={`p-4 rounded-2xl shadow-sm ${isMe ? 'bg-primary text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
+                            }`}>
                             <p className={`text-xs font-black mb-1 opacity-70 ${!isMe && 'text-primary'}`}>
                               {isMe ? 'You' : comment.profiles?.full_name || 'System User'}
                             </p>
@@ -246,15 +245,15 @@ export default function KaizenView() {
               </div>
             </CardContent>
             <CardFooter className="p-4 border-t border-slate-100 bg-white">
-              <form 
+              <form
                 className="flex items-center gap-2 w-full"
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (commentText.trim()) commentMutation.mutate(commentText);
                 }}
               >
-                <Input 
-                  placeholder="Type a message..." 
+                <Input
+                  placeholder="Type a message..."
                   className="flex-1 border-slate-200 bg-slate-50 h-10 rounded-xl"
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
@@ -270,7 +269,7 @@ export default function KaizenView() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          
+
           {/* Submitter Info */}
           <Card className="border-slate-200 shadow-xl shadow-slate-200/50 rounded-3xl">
             <CardHeader className="p-6 pb-2">
@@ -306,18 +305,18 @@ export default function KaizenView() {
                   <>
                     <div className="space-y-3">
                       <Label className="text-xs font-black text-slate-500 uppercase tracking-widest text-center w-full block">Assign Score (1-10)</Label>
-                      <Input 
-                        type="number" 
-                        min="1" max="10" 
-                        placeholder="10" 
+                      <Input
+                        type="number"
+                        min="1" max="10"
+                        placeholder="10"
                         className="text-center text-2xl font-black h-14 bg-white border-primary/20 focus:border-primary text-primary mx-auto w-32 rounded-2xl"
                         value={score}
                         onChange={(e) => setScore(e.target.value)}
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3 pt-4 border-t border-primary/10">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="h-12 border-red-200 text-red-600 hover:bg-red-50 font-bold rounded-xl"
                         onClick={() => setShowRejectForm(true)}
                         disabled={evaluateMutation.isLoading}
@@ -325,7 +324,7 @@ export default function KaizenView() {
                         <XCircle className="w-4 h-4 mr-2" />
                         Reject
                       </Button>
-                      <Button 
+                      <Button
                         className="h-12 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl"
                         onClick={handleApprove}
                         disabled={evaluateMutation.isLoading}
@@ -339,7 +338,7 @@ export default function KaizenView() {
                   <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
                     <div className="space-y-2">
                       <Label className="text-xs font-black text-red-500 uppercase tracking-widest">Reason for Rejection</Label>
-                      <Textarea 
+                      <Textarea
                         placeholder="Explain why this idea is not viable..."
                         className="bg-white border-red-200 focus:border-red-500 min-h-[100px] rounded-xl"
                         value={rejectionReason}
@@ -347,14 +346,14 @@ export default function KaizenView() {
                       />
                     </div>
                     <div className="flex gap-2">
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className="flex-1 font-bold text-slate-500"
                         onClick={() => setShowRejectForm(false)}
                       >
                         Cancel
                       </Button>
-                      <Button 
+                      <Button
                         className="flex-1 bg-red-500 hover:bg-red-600 font-bold text-white rounded-xl"
                         onClick={handleReject}
                         disabled={evaluateMutation.isLoading}
@@ -404,9 +403,9 @@ export default function KaizenView() {
           </DialogHeader>
           <DialogFooter className="mt-6">
             <Button variant="ghost" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>
-            <Button 
-              onClick={() => deleteKaizenMutation.mutate()} 
-              disabled={deleteKaizenMutation.isLoading} 
+            <Button
+              onClick={() => deleteKaizenMutation.mutate()}
+              disabled={deleteKaizenMutation.isLoading}
               className="bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl"
             >
               {deleteKaizenMutation.isLoading ? <Loader2 className="animate-spin" /> : "Yes, Delete Kaizen"}

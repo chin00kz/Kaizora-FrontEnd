@@ -17,10 +17,10 @@ import {
 
 import { useAuth } from "../context/AuthContext"
 import { cn } from "../lib/utils"
-import { 
-  Avatar, 
-  AvatarFallback, 
-  AvatarImage 
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage
 } from "./ui/avatar"
 import {
   Sidebar,
@@ -42,7 +42,6 @@ import {
 
 // Assets
 import logo from "../assets/logo.jpg"
-import superadminAvatar from "../assets/superadmin.jpg"
 const menuItems = [
   {
     title: "My Profile",
@@ -193,7 +192,7 @@ export function AppSidebar({ ...props }) {
                   className="w-full data-[state=open]:bg-slate-200 rounded-xl transition-colors bg-white/50 border border-slate-100"
                 >
                   <Avatar className="w-8 h-8 border border-slate-200 shadow-sm">
-                    <AvatarImage src={profile?.role === 'superadmin' ? superadminAvatar : (profile?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(profile?.email || 'user')}`)} className="object-cover" />
+                    <AvatarImage src={profile?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(profile?.email || 'user')}`} />
                     <AvatarFallback className={cn(
                       "font-bold text-xs uppercase",
                       profile?.role === 'superadmin' ? 'bg-accent/20 text-accent' : 'bg-primary/20 text-primary'

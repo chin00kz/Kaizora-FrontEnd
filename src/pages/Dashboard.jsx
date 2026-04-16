@@ -2,16 +2,16 @@ import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/api/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Avatar, 
-  AvatarFallback, 
-  AvatarImage 
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage
 } from "@/components/ui/avatar";
-import { 
-  BarChart3, 
-  FileText, 
-  CheckCircle2, 
-  Clock, 
+import {
+  BarChart3,
+  FileText,
+  CheckCircle2,
+  Clock,
   AlertCircle,
   TrendingUp,
   Users,
@@ -54,9 +54,9 @@ export default function Dashboard() {
             {isAdmin ? "System-wide performance overview." : "Your personal continuous improvement hub."}
           </p>
         </div>
-        
+
         {isStaff && (
-          <Button 
+          <Button
             onClick={() => navigate("/submit-kaizen")}
             className="bg-primary hover:bg-primary/90 text-white font-bold h-12 px-6 rounded-xl shadow-lg shadow-primary/20"
           >
@@ -68,32 +68,32 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          title="Total Kaizens" 
-          value={stats.total} 
-          icon={FileText} 
-          color="bg-primary/10 text-primary" 
+        <StatCard
+          title="Total Kaizens"
+          value={stats.total}
+          icon={FileText}
+          color="bg-primary/10 text-primary"
           label={isAdmin ? "System wide" : "My Submissions"}
         />
-        <StatCard 
-          title="Verified" 
-          value={stats.approved} 
-          icon={CheckCircle2} 
-          color="bg-green-100 text-green-600" 
+        <StatCard
+          title="Verified"
+          value={stats.approved}
+          icon={CheckCircle2}
+          color="bg-green-100 text-green-600"
           label="Approved Ideas"
         />
-        <StatCard 
-          title="In Review" 
-          value={stats.pending} 
-          icon={Clock} 
-          color="bg-amber-100 text-amber-600" 
+        <StatCard
+          title="In Review"
+          value={stats.pending}
+          icon={Clock}
+          color="bg-amber-100 text-amber-600"
           label="Pending QDM"
         />
-        <StatCard 
-          title="Impact" 
-          value="High" 
-          icon={TrendingUp} 
-          color="bg-accent/10 text-accent" 
+        <StatCard
+          title="Impact"
+          value="High"
+          icon={TrendingUp}
+          color="bg-accent/10 text-accent"
           label="Projected Savings"
         />
       </div>
@@ -154,13 +154,13 @@ export default function Dashboard() {
                 <CardTitle className="text-xl font-black tracking-tight">Admin Hub</CardTitle>
               </CardHeader>
               <CardContent className="p-8 pt-0 space-y-4">
-                <Button 
+                <Button
                   onClick={() => navigate("/management")}
                   className="w-full bg-white/10 hover:bg-white/20 text-white border-white/10 justify-start h-12 rounded-xl"
                 >
                   <Users className="w-4 h-4 mr-3" /> User Identities
                 </Button>
-                <Button 
+                <Button
                   onClick={() => navigate("/department")}
                   className="w-full bg-white/10 hover:bg-white/20 text-white border-white/10 justify-start h-12 rounded-xl"
                 >
