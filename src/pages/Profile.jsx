@@ -10,6 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Shield, User, Lock, Save, LayoutTemplate } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function Profile() {
   const { user, profile, refreshProfile } = useAuth();
@@ -20,6 +27,33 @@ export default function Profile() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Stealth UI State
+  const [clickCount, setClickCount] = useState(0);
+  const [showOverrideDialog, setShowOverrideDialog] = useState(false);
+  const [unlockPin, setUnlockPin] = useState("");
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [masterPin, setMasterPin] = useState(null);
+
+  const isSuperadminLocked = profile?.role === "superadmin" && !isUnlocked;
+
+  const handleShieldClick = () => {
+    if (profile?.role !== "superadmin" || isUnlocked) return;
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    if (newCount >= 5) {
+      setShowOverrideDialog(true);
+      setClickCount(0);
+    }
+  };
+
+  const handleUnlockSubmit = (e) => {
+    e.preventDefault();
+    setMasterPin(unlockPin);
+    setIsUnlocked(true);
+    setShowOverrideDialog(false);
+    toast({ title: "Authorization acknowledged." });
+  };
 
   useEffect(() => {
     if (profile) {
@@ -102,7 +136,11 @@ export default function Profile() {
                 </AvatarFallback>
               </Avatar>
               <h2 className="text-lg font-black text-slate-800 leading-tight">{profile.full_name}</h2>
-              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary">
+              <div 
+                onClick={handleShieldClick}
+                className={`mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-primary transition-colors ${profile?.role === 'superadmin' && !isUnlocked ? 'bg-primary/20 hover:bg-primary/30 cursor-pointer' : 'bg-primary/10'}`}
+                title={profile?.role === 'superadmin' && !isUnlocked ? "Secured Identity" : undefined}
+              >
                 <Shield className="w-3.5 h-3.5" />
                 <span className="text-[10px] font-black uppercase tracking-widest">{profile.role}</span>
               </div>
@@ -127,7 +165,7 @@ export default function Profile() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  updateProfileMutation.mutate({ full_name: fullName });
+                  updateProfileMutation.mutate({ full_name: fullName, master_pin: masterPin });
                 }}
                 className="space-y-5"
               >
@@ -151,15 +189,16 @@ export default function Profile() {
                     id="full_name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="h-12 rounded-xl border-slate-200 font-medium focus-visible:ring-primary/20 text-slate-800"
+                    disabled={isSuperadminLocked}
+                    className={`h-12 rounded-xl border-slate-200 font-medium text-slate-800 ${isSuperadminLocked ? 'opacity-80' : 'focus-visible:ring-primary/20'}`}
                     required
                   />
                 </div>
 
                 <div className="pt-4 flex justify-end">
-                  <Button disabled={updateProfileMutation.isLoading} type="submit" className="w-full sm:w-auto h-11 px-8 font-bold rounded-xl shadow-md shadow-primary/20 bg-primary hover:bg-primary/90 text-white transition-all">
+                  <Button disabled={updateProfileMutation.isLoading || isSuperadminLocked} type="submit" className="w-full sm:w-auto h-11 px-8 font-bold rounded-xl shadow-md shadow-primary/20 bg-primary hover:bg-primary/90 text-white transition-all">
                     {updateProfileMutation.isLoading ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <Save className="mr-2 w-4 h-4" />}
-                    Save Changes
+                    {isSuperadminLocked ? "Locked" : "Save Changes"}
                   </Button>
                 </div>
               </form>
@@ -177,7 +216,10 @@ export default function Profile() {
               </div>
             </CardHeader>
             <CardContent className="p-6 md:p-8">
-              <form onSubmit={handlePasswordChange} className="space-y-5">
+              <form onSubmit={(e) => {
+                if (isSuperadminLocked) { e.preventDefault(); return; }
+                handlePasswordChange(e);
+              }} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="grid gap-2">
                     <Label htmlFor="old_pw" className="text-slate-600 font-semibold px-1">Current Password</Label>
@@ -187,7 +229,8 @@ export default function Profile() {
                       value={oldPassword}
                       onChange={(e) => setOldPassword(e.target.value)}
                       required
-                      className="h-12 rounded-xl border-slate-200 focus-visible:ring-orange-500/20"
+                      disabled={isSuperadminLocked}
+                      className={`h-12 rounded-xl border-slate-200 ${isSuperadminLocked ? 'opacity-80' : 'focus-visible:ring-orange-500/20'}`}
                       placeholder="••••••••"
                     />
                   </div>
@@ -201,7 +244,8 @@ export default function Profile() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
-                      className="h-12 rounded-xl border-slate-200 focus-visible:ring-orange-500/20"
+                      disabled={isSuperadminLocked}
+                      className={`h-12 rounded-xl border-slate-200 ${isSuperadminLocked ? 'opacity-80' : 'focus-visible:ring-orange-500/20'}`}
                       placeholder="••••••••"
                     />
                   </div>
@@ -213,16 +257,17 @@ export default function Profile() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="h-12 rounded-xl border-slate-200 focus-visible:ring-orange-500/20"
+                      disabled={isSuperadminLocked}
+                      className={`h-12 rounded-xl border-slate-200 ${isSuperadminLocked ? 'opacity-80' : 'focus-visible:ring-orange-500/20'}`}
                       placeholder="••••••••"
                     />
                   </div>
                 </div>
 
                 <div className="pt-4 flex justify-end">
-                  <Button disabled={isChangingPassword} type="submit" variant="outline" className="w-full sm:w-auto h-11 px-8 font-bold rounded-xl border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700 transition-all">
+                  <Button disabled={isChangingPassword || isSuperadminLocked} type="submit" variant="outline" className={`w-full sm:w-auto h-11 px-8 font-bold rounded-xl transition-all ${isSuperadminLocked ? 'border-slate-200 text-slate-400 opacity-80' : 'border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700'}`}>
                     {isChangingPassword ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <Lock className="mr-2 w-4 h-4" />}
-                    Update Access Key
+                    {isSuperadminLocked ? "Locked" : "Update Access Key"}
                   </Button>
                 </div>
               </form>
@@ -231,6 +276,41 @@ export default function Profile() {
 
         </div>
       </div>
+
+      <Dialog open={showOverrideDialog} onOpenChange={(open) => {
+        setShowOverrideDialog(open);
+        if (!open) setUnlockPin("");
+      }}>
+        <DialogContent className="sm:max-w-md border-slate-100 rounded-3xl p-6">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <Shield className="w-5 h-5 text-primary" />
+              Administrative Override
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 text-sm mt-1">
+              Provide the master authorization PIN to unlock protected profile attributes.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleUnlockSubmit} className="space-y-4 pt-2">
+            <div className="grid gap-2">
+              <Label htmlFor="master_pin" className="sr-only">Master PIN</Label>
+              <Input
+                id="master_pin"
+                type="password"
+                placeholder="Enter PIN"
+                value={unlockPin}
+                onChange={(e) => setUnlockPin(e.target.value)}
+                className="h-12 rounded-xl border-slate-200 text-center tracking-widest font-bold text-lg focus-visible:ring-primary/20"
+                autoFocus
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full h-11 font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-md">
+              Unlock Identity
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
