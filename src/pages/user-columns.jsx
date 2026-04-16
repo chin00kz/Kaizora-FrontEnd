@@ -6,6 +6,7 @@ import {
   AvatarFallback, 
   AvatarImage 
 } from "@/components/ui/avatar";
+import superadminAvatar from "../assets/superadmin.jpg";
 import { 
   BarChart3, 
   CheckCircle2, 
@@ -77,7 +78,7 @@ export const columns = (
       return (
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border border-slate-200 shadow-sm">
-            <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user.email || 'guest')}`} />
+            <AvatarImage src={user.role === 'superadmin' ? superadminAvatar : (user.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user.email || 'guest')}`)} className="object-cover" />
             <AvatarFallback className="bg-slate-100 font-bold text-slate-600 text-sm">
               {user.full_name?.charAt(0) || user.email?.charAt(0)}
             </AvatarFallback>

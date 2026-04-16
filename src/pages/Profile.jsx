@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Shield, User, Lock, Save, LayoutTemplate } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import superadminAvatar from "../assets/superadmin.jpg";
 
 export default function Profile() {
   const { user, profile, refreshProfile } = useAuth();
@@ -30,7 +31,7 @@ export default function Profile() {
   // Fetch departments to resolve the UUID to a real name
   const { data: departments } = useQuery({
     queryKey: ['departments'],
-    queryFn: () => api.get('/departments').then(res => res.data.departments || []),
+    queryFn: () => api.get('/departments').then(res => res.data.data.departments || []),
   });
   
   const deptName = departments?.find(d => d.id === profile?.department_id)?.name || profile?.department_id || "Unassigned";
@@ -96,7 +97,7 @@ export default function Profile() {
           <Card className="border-slate-100 shadow-sm rounded-3xl overflow-hidden bg-white/60 backdrop-blur-xl text-center">
             <CardContent className="p-6 pt-10 flex flex-col items-center">
               <Avatar className="w-28 h-28 border-4 border-white shadow-xl shadow-slate-200/50 mb-5 relative">
-                <AvatarImage src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user?.email || '')}`} className="bg-slate-50" />
+                <AvatarImage src={profile.role === 'superadmin' ? superadminAvatar : `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user?.email || '')}`} className="bg-slate-50 object-cover" />
                 <AvatarFallback className="bg-primary/10 text-primary font-black text-3xl">
                   {profile.full_name?.charAt(0) || 'U'}
                 </AvatarFallback>
