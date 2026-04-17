@@ -19,6 +19,7 @@ import Analytics from './pages/Analytics';
 import AdminOverview from './pages/AdminOverview';
 import SuperAdminConsole from './pages/SuperAdminConsole';
 import Maintenance from './pages/Maintenance';
+import About from './pages/About';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import { Toaster } from "@/components/ui/toaster"
@@ -147,6 +148,14 @@ function App() {
             <ProtectedRoute allowedRoles={['superadmin']}>
               <MainLayout>
                 <SuperAdminConsole />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/about" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <About />
               </MainLayout>
             </ProtectedRoute>
           } />

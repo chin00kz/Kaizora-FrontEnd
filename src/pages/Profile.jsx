@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Shield, User, Lock, Save, LayoutTemplate } from "lucide-react";
+import { Loader2, Shield, User, Lock, Save, LayoutTemplate, Globe, Info } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
@@ -114,6 +116,48 @@ export default function Profile() {
     }
   };
 
+  // Creator Control Logic
+  const { data: creatorProfile, isLoading: isCreatorLoading } = useQuery({
+    queryKey: ['creator-profile'],
+    queryFn: () => api.get('/system/about').then(res => 
+      res.data.data.creators.find(c => {
+        const hasFullName = profile && profile.full_name;
+        if (!hasFullName) return false;
+        
+        return c.nickname === profile.full_name.split(' ')[0] || c.full_name === profile.full_name;
+      })
+    ),
+    enabled: !!profile,
+  });
+
+  const [creatorForm, setCreatorForm] = useState({
+    nickname: "",
+    is_visible: true,
+    social_links: { primary: "" }
+  });
+
+  useEffect(() => {
+    if (creatorProfile) {
+      setCreatorForm({
+        nickname: creatorProfile.nickname || "",
+        is_visible: creatorProfile.is_visible,
+        social_links: {
+          ...creatorProfile.social_links,
+          primary: creatorProfile.social_links?.primary || ""
+        }
+      });
+    }
+  }, [creatorProfile]);
+
+  const updateCreatorMutation = useMutation({
+    mutationFn: (data) => api.patch('/system/creators/profile', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['system-about']);
+      toast({ title: "Creator presence updated." });
+    },
+    onError: (err) => toast({ title: "Update failed", description: err.message, variant: "destructive" })
+  });
+
   if (!profile) return null;
 
   return (
@@ -146,6 +190,8 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
+
+
         </div>
 
         {/* Right Column - Forms */}
@@ -204,6 +250,7 @@ export default function Profile() {
               </form>
             </CardContent>
           </Card>
+
 
           <Card className="border-slate-100 shadow-md shadow-slate-200/30 rounded-3xl overflow-hidden bg-white">
             <CardHeader className="border-b border-slate-50 bg-slate-50/30 p-6 flex flex-row items-center gap-3">
@@ -273,6 +320,75 @@ export default function Profile() {
               </form>
             </CardContent>
           </Card>
+
+          {creatorProfile && (
+            <Card className="border-slate-100 shadow-xl shadow-slate-200/40 rounded-3xl overflow-hidden bg-white/90 backdrop-blur-md animate-in zoom-in-95 duration-500 border-t-4 border-t-primary/20">
+                <CardHeader className="border-b border-slate-50 bg-slate-50/50 p-6 flex flex-row items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+                            <Globe className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex flex-col">
+                            <CardTitle className="text-base font-bold text-slate-800 leading-none mb-1.5">Creator Presence</CardTitle>
+                            <CardDescription className="text-[10px] font-semibold text-slate-400">Manage your About page footprint</CardDescription>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-100/80 px-3 py-1.5 rounded-full border border-slate-200/50">
+                        <Switch 
+                            checked={creatorForm.is_visible} 
+                            onCheckedChange={(val) => setCreatorForm(f => ({...f, is_visible: val}))}
+                        />
+                        <span className="text-[9px] font-black uppercase text-slate-500 min-w-[36px] text-center">
+                            {creatorForm.is_visible ? "Public" : "Hidden"}
+                        </span>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-6 md:p-8 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid gap-2">
+                            <div className="flex items-center gap-2 px-1">
+                                <User className="w-3.5 h-3.5 text-slate-400" />
+                                <Label className="text-slate-600 font-bold text-xs uppercase tracking-tight">Display Name</Label>
+                            </div>
+                            <Input 
+                                value={creatorForm.nickname}
+                                onChange={(e) => setCreatorForm(f => ({...f, nickname: e.target.value}))}
+                                placeholder="e.g. Chanuka"
+                                className="h-12 rounded-2xl border-slate-200 bg-slate-50/30 focus-visible:ring-primary/20 font-medium"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <div className="flex items-center gap-2 px-1">
+                                <Globe className="w-3.5 h-3.5 text-slate-400" />
+                                <Label className="text-slate-600 font-bold text-xs uppercase tracking-tight">Primary Hyperlink</Label>
+                            </div>
+                            <Input 
+                                value={creatorForm.social_links?.primary || ""}
+                                onChange={(e) => setCreatorForm(f => ({...f, social_links: { ...f.social_links, primary: e.target.value }}))}
+                                placeholder="https://linkedin.com/in/username"
+                                className="h-12 rounded-2xl border-slate-200 bg-slate-50/30 focus-visible:ring-primary/20 font-medium"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                        <Button 
+                            onClick={() => updateCreatorMutation.mutate(creatorForm)}
+                            disabled={updateCreatorMutation.isLoading}
+                            className="w-full sm:w-auto h-12 px-12 font-black rounded-2xl shadow-lg shadow-primary/10 border-primary/20 text-primary hover:bg-primary hover:text-white transition-all duration-300 group"
+                            variant="outline"
+                        >
+                            {updateCreatorMutation.isLoading ? (
+                                <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                            ) : (
+                                <Save className="mr-2 w-4 h-4 group-hover:scale-110 transition-transform" />
+                            )}
+                            UPDATE CREATOR PRESENCE
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+          )}
 
         </div>
       </div>

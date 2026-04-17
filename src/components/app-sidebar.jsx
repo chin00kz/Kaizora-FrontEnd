@@ -13,6 +13,7 @@ import {
   ClipboardCheck,
   Building,
   User,
+  Info,
 } from "lucide-react"
 
 import { useAuth } from "../context/AuthContext"
@@ -96,6 +97,12 @@ const menuItems = [
     icon: ShieldCheck,
     url: "/superadmin-console",
     roles: ["superadmin"],
+  },
+  {
+    title: "About",
+    icon: Info,
+    url: "/about",
+    roles: ["employee", "qdm", "hod", "admin", "superadmin"],
   },
 ]
 
