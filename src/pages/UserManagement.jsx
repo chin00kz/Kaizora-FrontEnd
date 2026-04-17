@@ -194,7 +194,7 @@ export default function UserManagement() {
     total: usersData?.length || 0,
     pending: usersData?.filter(u => !u.is_approved).length || 0,
     banned: usersData?.filter(u => u.is_banned).length || 0,
-    superadmins: usersData?.filter(u => u.role === 'superadmin').length || 0,
+    admins: usersData?.filter(u => u.role === 'admin').length || 0,
   };
 
   // Generate Table Columns
@@ -495,8 +495,8 @@ export default function UserManagement() {
               <Shield className="w-6 h-6 text-accent" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider leading-none mb-1">Super Admins</p>
-              <h3 className="text-2xl font-black text-slate-900">{stats.superadmins}</h3>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider leading-none mb-1">Admins</p>
+              <h3 className="text-2xl font-black text-slate-900">{stats.admins}</h3>
             </div>
           </CardContent>
         </Card>

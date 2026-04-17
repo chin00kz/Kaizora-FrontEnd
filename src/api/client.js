@@ -70,6 +70,15 @@ api.interceptors.response.use(
         detail: { message: 'Server is currently unreachable.' }
       }));
     }
+
+    // Handle Maintenance Mode (503)
+    if (error.response?.status === 503 && error.response?.data?.status === 'maintenance') {
+      const isMaintenancePage = window.location.pathname === '/maintenance';
+      if (!isMaintenancePage) {
+        window.location.href = '/maintenance';
+      }
+    }
+
     return Promise.reject(error);
   }
 );

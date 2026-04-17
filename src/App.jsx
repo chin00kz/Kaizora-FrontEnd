@@ -15,35 +15,17 @@ import KaizenView from './pages/KaizenView';
 import Profile from './pages/Profile';
 import QDMPortal from './pages/QDMPortal';
 import PendingApproval from './pages/PendingApproval';
+import Analytics from './pages/Analytics';
+import AdminOverview from './pages/AdminOverview';
+import SuperAdminConsole from './pages/SuperAdminConsole';
+import Maintenance from './pages/Maintenance';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import { Toaster } from "@/components/ui/toaster"
 
-const AdminSettings = () => (
-  <div className="space-y-4">
-    <h1 className="text-2xl font-bold text-slate-900">Admin Settings</h1>
-    <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-slate-500 italic">
-      System configuration and administrative tools.
-    </div>
-  </div>
-);
 
-const SuperAdminPanel = () => (
-  <div className="space-y-4">
-    <div className="flex items-center gap-3 mb-6">
-      <div className="w-10 h-10 bg-accent/20 rounded-xl flex items-center justify-center border border-accent/30">
-        <span className="text-accent text-xl">⚡</span>
-      </div>
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Super Admin Panel</h1>
-        <p className="text-slate-500 text-sm">Full system control — handle with care.</p>
-      </div>
-    </div>
-    <div className="bg-accent/5 border border-accent/20 rounded-2xl p-6">
-      <p className="text-accent font-semibold">⚠️ User management, system settings, and advanced controls will be built here.</p>
-    </div>
-  </div>
-);
+
+
 
 const queryClient = new QueryClient();
 
@@ -135,6 +117,14 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/analytics" element={
+            <ProtectedRoute allowedRoles={['qdm', 'hod', 'admin', 'superadmin']}>
+              <MainLayout>
+                <Analytics />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
           <Route path="/department" element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
               <MainLayout>
@@ -143,18 +133,20 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="/admin" element={
+          <Route path="/maintenance" element={<Maintenance />} />
+
+          <Route path="/system-overview" element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
               <MainLayout>
-                <AdminSettings />
+                <AdminOverview />
               </MainLayout>
             </ProtectedRoute>
           } />
 
-          <Route path="/superadmin" element={
+          <Route path="/superadmin-console" element={
             <ProtectedRoute allowedRoles={['superadmin']}>
               <MainLayout>
-                <SuperAdminPanel />
+                <SuperAdminConsole />
               </MainLayout>
             </ProtectedRoute>
           } />

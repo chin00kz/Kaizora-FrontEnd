@@ -86,15 +86,15 @@ const menuItems = [
     roles: ["qdm", "hod", "admin", "superadmin"],
   },
   {
-    title: "Admin Panel",
+    title: "System Overview",
     icon: Settings,
-    url: "/admin",
+    url: "/system-overview",
     roles: ["admin", "superadmin"],
   },
   {
-    title: "Super Admin",
+    title: "Nuclear Console",
     icon: ShieldCheck,
-    url: "/superadmin",
+    url: "/superadmin-console",
     roles: ["superadmin"],
   },
 ]

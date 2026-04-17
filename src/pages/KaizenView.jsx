@@ -303,16 +303,28 @@ export default function KaizenView() {
               <CardContent className="p-6 space-y-6">
                 {!showRejectForm ? (
                   <>
-                    <div className="space-y-3">
-                      <Label className="text-xs font-black text-slate-500 uppercase tracking-widest text-center w-full block">Assign Score (1-10)</Label>
-                      <Input
-                        type="number"
-                        min="1" max="10"
-                        placeholder="10"
-                        className="text-center text-2xl font-black h-14 bg-white border-primary/20 focus:border-primary text-primary mx-auto w-32 rounded-2xl"
-                        value={score}
-                        onChange={(e) => setScore(e.target.value)}
-                      />
+                    <div className="space-y-4">
+                      <Label className="text-[10px] font-black text-primary/60 uppercase tracking-[0.2em] text-center w-full block">Innovation Quality Score</Label>
+                      <div className="flex items-center justify-between gap-2 px-2">
+                        {[...Array(10)].map((_, i) => (
+                          <button
+                            key={i + 1}
+                            onClick={() => setScore((i + 1).toString())}
+                            className={cn(
+                              "w-8 h-10 rounded-lg font-black text-xs transition-all border flex items-center justify-center",
+                              parseInt(score) === i + 1 
+                                ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110" 
+                                : "bg-white text-slate-400 border-slate-100 hover:border-primary/30 hover:text-primary"
+                            )}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex justify-between px-1 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                        <span>Minor Tweak</span>
+                        <span>Game Changer</span>
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3 pt-4 border-t border-primary/10">
                       <Button
