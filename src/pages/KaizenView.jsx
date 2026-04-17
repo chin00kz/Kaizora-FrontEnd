@@ -312,8 +312,8 @@ export default function KaizenView() {
                             onClick={() => setScore((i + 1).toString())}
                             className={cn(
                               "w-8 h-10 rounded-lg font-black text-xs transition-all border flex items-center justify-center",
-                              parseInt(score) === i + 1 
-                                ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110" 
+                              parseInt(score) === i + 1
+                                ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110"
                                 : "bg-white text-slate-400 border-slate-100 hover:border-primary/30 hover:text-primary"
                             )}
                           >

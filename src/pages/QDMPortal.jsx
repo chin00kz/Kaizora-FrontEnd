@@ -11,12 +11,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  FileText, 
-  Search, 
-  Clock, 
-  CheckCircle2, 
-  XCircle, 
+import {
+  FileText,
+  Search,
+  Clock,
+  CheckCircle2,
+  XCircle,
   Loader2,
   ExternalLink,
   BarChart3,
@@ -42,7 +42,7 @@ export default function QDMPortal() {
     queryFn: () => api.get("/kaizens").then((res) => res.data.data.kaizens),
   });
 
-  const filteredKaizens = kaizens?.filter(k => 
+  const filteredKaizens = kaizens?.filter(k =>
     k.title?.toLowerCase().includes(search.toLowerCase()) ||
     k.category?.toLowerCase().includes(search.toLowerCase()) ||
     k.profiles?.full_name?.toLowerCase().includes(search.toLowerCase())
@@ -83,8 +83,8 @@ export default function QDMPortal() {
                 <CardTitle className="text-lg font-bold text-[#4c1d95]">Pending & History</CardTitle>
                 <div className="relative w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input 
-                    placeholder="Search by title, submitter..." 
+                  <Input
+                    placeholder="Search by title, submitter..."
                     className="pl-9 h-10 bg-white border-slate-200 rounded-xl"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}

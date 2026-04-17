@@ -136,7 +136,7 @@ export default function Analytics() {
              <ResponsiveContainer width="100%" height="90%">
                <PieChart>
                  <Pie
-                    data={stats?.statusPie}
+                    data={statusPie}
                     cx="50%"
                     cy="50%"
                     innerRadius={70}
@@ -145,7 +145,7 @@ export default function Analytics() {
                     dataKey="value"
                     stroke="none"
                  >
-                   {stats?.statusPie.map((entry, index) => (
+                   {statusPie.map((entry, index) => (
                      <Cell key={`cell-${index}`} fill={entry.color} />
                    ))}
                  </Pie>

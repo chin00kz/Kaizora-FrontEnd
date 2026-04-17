@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/api/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Trophy, 
-  TrendingUp, 
-  Users, 
-  Building2, 
+import {
+  Trophy,
+  TrendingUp,
+  Users,
+  Building2,
   Target,
   Loader2,
   Medal,
@@ -49,23 +49,23 @@ export default function IntelligenceHub() {
     <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-700">
       {/* Top Level Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <MetricCard 
-          title="Innovation Index" 
-          value={leaderboard?.users?.[0]?.innovationIndex || "0.0"} 
+        <MetricCard
+          title="Innovation Index"
+          value={leaderboard?.users?.[0]?.innovationIndex || "0.0"}
           label="Top Performer Score"
           icon={<Target className="w-5 h-5 text-emerald-500" />}
           trend="+12% from last month"
         />
-        <MetricCard 
-          title="Submission Volume" 
-          value={metrics?.trends?.reduce((acc, curr) => acc + curr.submissions, 0) || 0} 
+        <MetricCard
+          title="Submission Volume"
+          value={metrics?.trends?.reduce((acc, curr) => acc + curr.submissions, 0) || 0}
           label="Total active pipeline"
           icon={<Activity className="w-5 h-5 text-blue-500" />}
           trend="Real-time stream"
         />
-        <MetricCard 
-          title="Average Quality" 
-          value={metrics?.trends?.[metrics.trends.length - 1]?.avgScore || "0.0"} 
+        <MetricCard
+          title="Average Quality"
+          value={metrics?.trends?.[metrics.trends.length - 1]?.avgScore || "0.0"}
           label="Recent evaluation avg"
           icon={<TrendingUp className="w-5 h-5 text-amber-500" />}
           trend="Target: > 8.0"
@@ -87,15 +87,15 @@ export default function IntelligenceHub() {
                 <div key={user.id} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="relative">
-                        <Avatar className="w-10 h-10 border-2 border-white shadow-sm">
-                            <AvatarImage src={user.avatar} />
-                            <AvatarFallback className="bg-[#4c1d95] text-white font-bold">{user.name[0]}</AvatarFallback>
-                        </Avatar>
-                        {index < 3 && (
-                            <div className="absolute -top-1 -left-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
-                                <Medal className={`w-3 h-3 ${index === 0 ? 'text-amber-500' : index === 1 ? 'text-slate-400' : 'text-amber-700'}`} />
-                            </div>
-                        )}
+                      <Avatar className="w-10 h-10 border-2 border-white shadow-sm">
+                        <AvatarImage src={user.avatar} />
+                        <AvatarFallback className="bg-[#4c1d95] text-white font-bold">{user.name[0]}</AvatarFallback>
+                      </Avatar>
+                      {index < 3 && (
+                        <div className="absolute -top-1 -left-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+                          <Medal className={`w-3 h-3 ${index === 0 ? 'text-amber-500' : index === 1 ? 'text-slate-400' : 'text-amber-700'}`} />
+                        </div>
+                      )}
                     </div>
                     <div>
                       <p className="font-bold text-slate-900 text-sm">{user.name}</p>
@@ -129,9 +129,9 @@ export default function IntelligenceHub() {
                     <span className="text-[10px] font-black text-[#4c1d95]">{dept.innovationIndex} pts</span>
                   </div>
                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div 
-                        className="h-full bg-[#4c1d95] rounded-full" 
-                        style={{ width: `${Math.min((dept.innovationIndex / 50) * 100, 100)}%` }} 
+                    <div
+                      className="h-full bg-[#4c1d95] rounded-full"
+                      style={{ width: `${Math.min((dept.innovationIndex / 50) * 100, 100)}%` }}
                     />
                   </div>
                 </div>
@@ -144,38 +144,38 @@ export default function IntelligenceHub() {
       {/* Submission Trend Chart */}
       <Card className="border-slate-200 shadow-xl rounded-3xl overflow-hidden bg-white">
         <CardHeader className="p-8">
-            <CardTitle className="text-lg font-black text-slate-800">Innovation Velocity</CardTitle>
-            <p className="text-sm text-slate-400 font-medium italic">Monthly submission volume vs quality index</p>
+          <CardTitle className="text-lg font-black text-slate-800">Innovation Velocity</CardTitle>
+          <p className="text-sm text-slate-400 font-medium italic">Monthly submission volume vs quality index</p>
         </CardHeader>
         <CardContent className="h-[300px] px-4 pb-8">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={metrics?.trends}>
               <defs>
                 <linearGradient id="colorSub" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4c1d95" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#4c1d95" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#4c1d95" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#4c1d95" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis 
-                dataKey="month" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{fontSize: 10, fontWeight: 700, fill: '#64748b'}} 
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }}
               />
-              <YAxis 
-                hide 
+              <YAxis
+                hide
               />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
               />
-              <Area 
-                type="monotone" 
-                dataKey="submissions" 
-                stroke="#4c1d95" 
+              <Area
+                type="monotone"
+                dataKey="submissions"
+                stroke="#4c1d95"
                 strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorSub)" 
+                fillOpacity={1}
+                fill="url(#colorSub)"
               />
             </AreaChart>
           </ResponsiveContainer>
