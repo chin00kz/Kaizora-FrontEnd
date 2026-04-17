@@ -15,7 +15,7 @@ export default function PendingApproval() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-6">
       <div className="max-w-md w-full">
-        
+
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="bg-white p-6 rounded-[2rem] shadow-2xl shadow-slate-200/50 border border-slate-100">
@@ -25,7 +25,7 @@ export default function PendingApproval() {
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 p-10 text-center">
-          
+
           {/* Icon */}
           <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-amber-100">
             <Clock className="w-10 h-10 text-amber-500" />
@@ -49,7 +49,7 @@ export default function PendingApproval() {
               <div>
                 <p className="text-amber-800 font-bold text-xs uppercase tracking-wider mb-1">What happens next?</p>
                 <p className="text-amber-700 text-xs leading-relaxed">
-                  An administrator will review your registration and activate your account. 
+                  An administrator will review your registration and activate your account.
                   You'll be able to log in once they approve it.
                 </p>
               </div>

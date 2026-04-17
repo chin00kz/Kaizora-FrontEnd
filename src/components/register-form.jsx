@@ -3,12 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select"
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
@@ -46,7 +46,7 @@ export function RegisterForm({
           .from('departments')
           .select('id, name')
           .order('name', { ascending: true })
-        
+
         if (error) throw error
         setDepartments(data || [])
       } catch (err) {
@@ -174,8 +174,8 @@ export function RegisterForm({
 
                 <div className="grid gap-2">
                   <Label htmlFor="departmentId" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Department</Label>
-                  <Select 
-                    onValueChange={handleSelectChange} 
+                  <Select
+                    onValueChange={handleSelectChange}
                     value={formData.departmentId}
                     required
                   >
@@ -221,7 +221,7 @@ export function RegisterForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-[10px] text-slate-400 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary font-medium tracking-wide uppercase leading-relaxed">
-        Protected by Intern security &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy</a> <br/>
+        Protected by Intern security &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy</a> <br />
         By signing up, you agree to drive continuous improvement within the FedEx ecosystem.
       </div>
     </div>

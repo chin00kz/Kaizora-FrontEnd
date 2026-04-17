@@ -25,7 +25,7 @@ export function LoginForm({
   // Easter Egg State
   const [logoClicks, setLogoClicks] = useState(0)
   const [showEasterEgg, setShowEasterEgg] = useState(false)
-  
+
   const { signIn } = useAuth()
   const navigate = useNavigate()
 
@@ -66,7 +66,7 @@ export function LoginForm({
                 <Heart className="w-8 h-8 text-red-500 fill-red-500" />
               </div>
               <p className="text-xl font-black text-slate-900 mb-2 leading-tight">
-                Made with Love By <br/>
+                Made with Love By <br />
                 <span className="text-primary italic">Madushi, Dasuni, Chanuka</span>
               </p>
               <div className="mt-6 flex gap-1">
@@ -99,11 +99,11 @@ export function LoginForm({
               <div className="space-y-5">
                 <div className="grid gap-2">
                   <Label htmlFor="email" className="text-slate-700 font-semibold text-xs uppercase tracking-wider">Email Address</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="name@fedexlk.com" 
-                    required 
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@fedexlk.com"
+                    required
                     className="h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 rounded-xl"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -117,10 +117,10 @@ export function LoginForm({
                     </a>
                   </div>
                   <div className="relative">
-                    <Input 
-                      id="password" 
-                      type={showPassword ? "text" : "password"} 
-                      required 
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      required
                       className="h-12 bg-slate-50 border-slate-200 text-slate-900 focus:border-primary focus:ring-primary/20 pr-10 rounded-xl"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -136,9 +136,9 @@ export function LoginForm({
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                disabled={loading} 
+              <Button
+                type="submit"
+                disabled={loading}
                 className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] text-base"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In to Kaizora"}
@@ -159,15 +159,15 @@ export function LoginForm({
               src={authBg}
               className="absolute inset-0 h-full w-full object-cover opacity-90 scale-x-[-1]" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/90 via-white/40 to-transparent"></div>
-            
+
             <div className="relative z-20 flex flex-col items-center text-center max-w-sm">
-              <div 
+              <div
                 onClick={handleLogoClick}
                 className="bg-white p-8 rounded-[2rem] shadow-2xl shadow-slate-200/50 mb-10 border border-white/50 animate-in zoom-in-95 duration-700 cursor-pointer hover:scale-[1.02] active:scale-95 transition-all select-none"
               >
                 <img src={logo} alt="FedEx Advantis" className="w-48 object-contain pointer-events-none" />
               </div>
-              
+
               <p className="text-2xl font-black text-slate-800 italic leading-tight mb-4 px-4 bg-white/10 backdrop-blur-md py-4 rounded-3xl border border-white/20">
                 &ldquo;Kaizen: Continuous improvement is better than delayed perfection.&rdquo;
               </p>
