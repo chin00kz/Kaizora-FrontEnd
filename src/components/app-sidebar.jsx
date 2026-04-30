@@ -126,7 +126,7 @@ export function AppSidebar({ ...props }) {
   const isSuperAdmin = profile?.role === 'superadmin'
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-slate-200 bg-[#f8fafc]" {...props}>
+    <Sidebar collapsible="icon" className="border-r border-slate-200 bg-sidebar" {...props}>
       <SidebarHeader className="h-20 flex items-center px-4 overflow-hidden">
         <div className="flex items-center gap-3">
           <img src={logo} alt="FedEx Advantis" className="w-8 h-8 object-contain rounded-md" />

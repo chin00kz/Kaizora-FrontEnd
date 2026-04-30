@@ -37,6 +37,23 @@ import {
   Trash2
 } from "lucide-react";
 
+/**
+ * Resolve the best available display name for a user object.
+ * Priority: full_name → formatted email prefix → fallback string
+ */
+function getDisplayName(userObj, fallback = 'Unknown User') {
+  if (!userObj) return fallback;
+  if (userObj.full_name) return userObj.full_name;
+  if (userObj.email) {
+    // Convert "john.doe@company.com" → "John Doe"
+    const prefix = userObj.email.split('@')[0];
+    return prefix
+      .replace(/[._-]+/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+  return fallback;
+}
+
 function getStatusColor(status) {
   switch (status) {
     case 'approved': return 'bg-green-100 text-green-700 border-green-200';
@@ -215,6 +232,8 @@ export default function KaizenView() {
                 ) : (
                   kaizen.comments?.map((comment) => {
                     const isMe = comment.user_id === profile?.id;
+                    const commenterName = isMe ? 'You' : getDisplayName(comment.profiles);
+                    const commenterInitial = commenterName.charAt(0).toUpperCase();
                     return (
                       <div key={comment.id} className={`flex items-start gap-3 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                         <Avatar className="w-8 h-8 shrink-0 mt-1 border border-slate-200">
@@ -223,14 +242,14 @@ export default function KaizenView() {
                             "text-[10px] font-black",
                             isMe ? "bg-primary/20 text-primary" : "bg-slate-200 text-slate-600"
                           )}>
-                            {(comment.profiles?.full_name || 'U').charAt(0)}
+                            {commenterInitial}
                           </AvatarFallback>
                         </Avatar>
                         <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[80%]`}>
                           <div className={`p-4 rounded-2xl shadow-sm ${isMe ? 'bg-primary text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
                             }`}>
                             <p className={`text-xs font-black mb-1 opacity-70 ${!isMe && 'text-primary'}`}>
-                              {isMe ? 'You' : comment.profiles?.full_name || 'System User'}
+                              {commenterName}
                             </p>
                             <p className="text-sm font-medium whitespace-pre-wrap">{comment.content}</p>
                           </div>
@@ -277,16 +296,27 @@ export default function KaizenView() {
             </CardHeader>
             <CardContent className="p-6 pt-4">
               <div className="flex items-center gap-4">
-                <Avatar className="w-12 h-12 border-2 border-white shadow-sm">
-                  <AvatarImage src={kaizen.submitter?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(kaizen.submitter?.email || 'submitter')}`} />
-                  <AvatarFallback className="bg-slate-100 font-black text-lg text-slate-600">
-                    {kaizen.submitter?.full_name?.charAt(0) || '?'}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-bold text-slate-900">{kaizen.submitter?.full_name || 'Unknown User'}</h3>
-                  <p className="text-xs font-bold text-slate-500">{kaizen.departments?.name || 'No Dept'}</p>
-                </div>
+                {(() => {
+                  const submitter = kaizen.submitter || kaizen.profiles ? { ...kaizen.submitter, ...(!kaizen.submitter?.email && kaizen.profiles ? { email: kaizen.profiles.email } : {}) } : null;
+                  const submitterName = getDisplayName(submitter || kaizen.profiles);
+                  const submitterInitial = submitterName.charAt(0).toUpperCase();
+                  const submitterAvatar = (submitter?.avatar_url || kaizen.profiles?.avatar_url) ||
+                    `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(submitter?.email || kaizen.profiles?.email || submitterName)}`;
+                  return (
+                    <>
+                      <Avatar className="w-12 h-12 border-2 border-white shadow-sm">
+                        <AvatarImage src={submitterAvatar} />
+                        <AvatarFallback className="bg-slate-100 font-black text-lg text-slate-600">
+                          {submitterInitial}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-bold text-slate-900">{submitterName}</h3>
+                        <p className="text-xs font-bold text-slate-500">{kaizen.departments?.name || 'No Dept'}</p>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </CardContent>
           </Card>

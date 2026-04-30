@@ -3,72 +3,66 @@
 @tailwind utilities;
 
 :root {
-  /* FedEx Light Theme Palette */
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  /* FedEx Light Theme Palette - Using HSL components for Tailwind opacity support */
+  --background: 0 0% 100%;
+  --foreground: 222.2 47.4% 11.2%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 47.4% 11.2%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 47.4% 11.2%;
   
   /* FedEx Brand Colors */
-  --primary: #4d148c; /* FedEx Purple */
-  --primary-foreground: #ffffff;
+  --primary: 268 75% 31%; /* FedEx Purple */
+  --primary-foreground: 0 0% 100%;
   
-  --secondary: #f3f4f6; /* Light Gray for Sidebar */
-  --secondary-foreground: #4d148c;
+  --secondary: 210 40% 96.1%; /* Light Gray for Sidebar */
+  --secondary-foreground: 268 75% 31%;
   
-  --accent: #ff6600; /* FedEx Orange */
-  --accent-foreground: #ffffff;
+  --accent: 24 100% 50%; /* FedEx Orange */
+  --accent-foreground: 0 0% 100%;
   
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
   
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
   
-  --border: #e2e8f0; 
-  --input: #f8fafc;
-  --ring: #ff6600;
+  --border: 214.3 31.8% 91.4%; 
+  --input: 210 40% 98%;
+  --ring: 24 100% 50%;
   --radius: 0.75rem;
+
+  /* Sidebar Variables */
+  --sidebar-background: 210 40% 98%;
+  --sidebar-foreground: 215.4 16.3% 46.9%;
+  --sidebar-primary: 268 75% 31%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 210 40% 96.1%;
+  --sidebar-accent-foreground: 268 75% 31%;
+  --sidebar-border: 214.3 31.8% 91.4%;
+  --sidebar-ring: 24 100% 50%;
 }
 
 * {
-  border-color: var(--border);
+  border-color: hsl(var(--border));
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* shadcn component CSS variable mappings - Updated for Light Theme */
-.bg-background { background-color: var(--background); }
-.text-foreground { color: var(--foreground); }
-.bg-card { background-color: var(--card); }
-.text-card-foreground { color: var(--card-foreground); }
-.text-muted-foreground { color: var(--muted-foreground); }
-.border-border { border-color: var(--border); }
-.bg-input { background-color: var(--input); }
-.text-primary { color: var(--primary); }
-.bg-primary { background-color: var(--primary); }
-.text-primary-foreground { color: var(--primary-foreground); }
-
 @layer base {
-  :root {
-    --sidebar-background: #f8fafc; /* grayish close to white */
-    --sidebar-foreground: #64748b;
-    --sidebar-primary: #4d148c;
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #f1f5f9;
-    --sidebar-accent-foreground: #4d148c;
-    --sidebar-border: #e2e8f0;
-    --sidebar-ring: #ff6600;
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

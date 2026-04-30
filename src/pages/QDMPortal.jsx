@@ -33,6 +33,17 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
+
+function getDisplayName(userObj, fallback = 'Unknown User') {
+  if (!userObj) return fallback;
+  if (userObj.full_name) return userObj.full_name;
+  if (userObj.email) {
+    const prefix = userObj.email.split('@')[0];
+    return prefix.replace(/[._-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+  return fallback;
+}
+
 export default function QDMPortal() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -129,7 +140,7 @@ export default function QDMPortal() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-800 text-sm">{kaizen.profiles?.full_name || 'Unknown User'}</span>
+                            <span className="font-bold text-slate-800 text-sm">{getDisplayName(kaizen.submitter || kaizen.profiles)}</span>
                             <span className="text-[10px] text-slate-500 font-bold uppercase">{kaizen.departments?.name || 'No Dept'}</span>
                           </div>
                         </TableCell>
