@@ -143,7 +143,7 @@ export default function KaizenView() {
       toast({ title: "Reason Required", description: "You must provide a reason for rejecting this Kaizen.", variant: "destructive" });
       return;
     }
-    evaluateMutation.mutate({ status: 'rejected', rejection_reason: rejectionReason, score: 0 });
+    evaluateMutation.mutate({ status: 'rejected', rejection_reason: rejectionReason });
   };
 
   return (
