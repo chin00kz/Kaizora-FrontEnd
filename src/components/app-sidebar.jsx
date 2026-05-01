@@ -44,15 +44,15 @@ import {
 // Assets
 const menuItems = [
   {
-    title: "My Profile",
-    icon: User,
-    url: "/profile",
-    roles: ["employee", "qdm", "hod", "admin", "superadmin"],
-  },
-  {
     title: "Dashboard",
     icon: LayoutDashboard,
     url: "/dashboard",
+    roles: ["employee", "qdm", "hod", "admin", "superadmin"],
+  },
+  {
+    title: "My Profile",
+    icon: User,
+    url: "/profile",
     roles: ["employee", "qdm", "hod", "admin", "superadmin"],
   },
   {
