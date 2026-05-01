@@ -30,45 +30,40 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AdminOverview() {
-  const [healthStatus, setHealthStatus] = useState({
-    api: "checking",
-    db: "checking",
-    latency: 0
-  });
-
+  const { profile } = useAuth();
+  
   // Queries
-  const { data: usersData, isLoading: loadingUsers } = useQuery({
+  const { data: usersData, isPending: loadingUsers } = useQuery({
     queryKey: ["users"],
     queryFn: () => api.get("/users").then((res) => res.data.data.profiles),
   });
 
-  const { data: kaizens, isLoading: loadingKaizens } = useQuery({
+  const { data: kaizens, isPending: loadingKaizens } = useQuery({
     queryKey: ["kaizens"],
     queryFn: () => api.get("/kaizens").then((res) => res.data.data.kaizens),
   });
 
-  const { data: deptsData, isLoading: loadingDepts } = useQuery({
+  const { data: deptsData, isPending: loadingDepts } = useQuery({
     queryKey: ["departments"],
     queryFn: () => api.get("/departments").then((res) => res.data.data.departments),
   });
 
-  // Health check simulation
-  useEffect(() => {
-    const checkHealth = () => {
-      setTimeout(() => {
-        setHealthStatus({
-          api: "healthy",
-          db: "healthy",
-          latency: Math.floor(Math.random() * 40) + 20
-        });
-      }, 800);
-    };
-    checkHealth();
-    const interval = setInterval(checkHealth, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  const { data: healthResult, isPending: loadingHealth } = useQuery({
+    queryKey: ["system-health-detailed"],
+    queryFn: async () => {
+      const start = performance.now();
+      const res = await api.get("health");
+      const end = performance.now();
+      return {
+        ...res.data,
+        latency: Math.round(end - start)
+      };
+    },
+    refetchInterval: 10000, // Check every 10s
+  });
 
   // Process data
   const stats = useMemo(() => {
@@ -78,17 +73,27 @@ export default function AdminOverview() {
       totalKaizens: kaizens.length,
       totalDepts: deptsData.length,
       pendingApproval: usersData.filter(u => !u.is_approved).length,
-      admins: usersData.filter(u => ['admin', 'superadmin'].includes(u.role))
+      admins: usersData.filter(u => ['admin', 'superadmin'].includes(u.role)),
+      isStable: healthResult?.status === 'OK'
     };
-  }, [usersData, kaizens, deptsData]);
+  }, [usersData, kaizens, deptsData, healthResult]);
 
-  if (loadingUsers || loadingKaizens || loadingDepts) {
+  // Only show the full-page loader if we haven't computed our stats yet
+  if (!stats) {
     return (
       <div className="flex items-center justify-center p-20">
         <Loader2 className="w-10 h-10 animate-spin text-primary" />
       </div>
     );
   }
+
+  const formatUptime = (seconds) => {
+    if (!seconds) return "0s";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h > 0 ? h + 'h ' : ''}${m > 0 ? m + 'm ' : ''}${s}s`;
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
@@ -109,9 +114,9 @@ export default function AdminOverview() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 cursor-help">
-                  <div className={`w-2 h-2 rounded-full ${healthStatus.api === 'healthy' ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`} />
+                  <div className={`w-2 h-2 rounded-full ${stats.isStable ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
                   <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">
-                    API: {healthStatus.latency}ms
+                    API: {healthResult?.latency || 0}ms
                   </span>
                 </div>
               </TooltipTrigger>
@@ -120,11 +125,13 @@ export default function AdminOverview() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 cursor-help">
-                  <div className={`w-2 h-2 rounded-full ${healthStatus.db === 'healthy' ? 'bg-green-500' : 'bg-amber-500'}`} />
-                  <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">DB Cluster</span>
+                  <div className={`w-2 h-2 rounded-full ${stats.isStable ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">
+                    Uptime: {formatUptime(healthResult?.uptime)}
+                  </span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent><p>Data Storage Health</p></TooltipContent>
+              <TooltipContent><p>Current Process Life</p></TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -135,7 +142,7 @@ export default function AdminOverview() {
         <PulseCard title="Total Identities" value={stats.totalUsers} icon={Users} color="bg-primary/10 text-primary" detail={`${stats.pendingApproval} Pending`} />
         <PulseCard title="Idea Pipeline" value={stats.totalKaizens} icon={FileText} color="bg-accent/10 text-accent" detail="System Wide" />
         <PulseCard title="Organization" value={stats.totalDepts} icon={Building} color="bg-emerald-100 text-emerald-600" detail="Active Nodes" />
-        <PulseCard title="Performance" value="Stable" icon={CheckCircle2} color="bg-amber-100 text-amber-600" detail="99.9% Uptime" />
+        <PulseCard title="Performance" value={stats.isStable ? "Stable" : "Degraded"} icon={CheckCircle2} color={stats.isStable ? "bg-amber-100 text-amber-600" : "bg-red-100 text-red-600"} detail={healthResult?.latency < 100 ? "Optimal" : "High Latency"} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -158,13 +165,20 @@ export default function AdminOverview() {
               <TableBody>
                 {stats.admins.map((admin) => (
                   <TableRow key={admin.id}>
-                    <TableCell className="px-8 font-bold text-slate-900">{admin.full_name}</TableCell>
+                    <TableCell className="px-8 font-bold text-slate-900 flex items-center gap-2">
+                      {admin.full_name}
+                      {admin.id === profile?.id && (
+                        <Badge className="bg-slate-100 text-slate-500 hover:bg-slate-100 border-0 text-[9px] h-4">YOU</Badge>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge className="bg-primary/10 text-primary border-0 rounded-lg uppercase text-[10px]">
                         {admin.role}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right px-8 font-bold text-green-600 text-xs">ONLINE</TableCell>
+                    <TableCell className={`text-right px-8 font-bold text-xs ${admin.is_approved ? 'text-green-600' : 'text-amber-600'}`}>
+                      {admin.is_approved ? 'ACTIVE' : 'PENDING'}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -175,14 +189,14 @@ export default function AdminOverview() {
         <Card className="border-slate-200 shadow-sm rounded-[2rem] p-8 space-y-6">
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Environment Info</h4>
           <div className="space-y-4">
-            <InfoRow icon={Terminal} label="Runtime" value="Node v20.x" />
+            <InfoRow icon={Terminal} label="Runtime" value={`Node ${healthResult?.nodeVersion || 'v20.x'}`} />
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-600">Region</span>
-              <span className="text-xs font-bold text-slate-400">AWS-Mumbai</span>
+              <span className="text-xs font-medium text-slate-600">Environment</span>
+              <span className="text-xs font-bold text-slate-400 uppercase">{healthResult?.env || 'development'}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-600">Edge Logic</span>
-              <span className="text-xs font-bold text-green-500">Active</span>
+              <span className="text-xs font-medium text-slate-600">Region</span>
+              <span className="text-xs font-bold text-slate-400">{healthResult?.env === 'development' ? 'Localhost' : 'Cloud-Edge'}</span>
             </div>
           </div>
         </Card>

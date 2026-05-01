@@ -12,8 +12,8 @@ import {
   Sparkles
 } from "lucide-react";
 import Papa from "papaparse";
-import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function ReportForge({ kaizens }) {
   const [isExporting, setIsExporting] = useState(null);
@@ -46,37 +46,44 @@ export default function ReportForge({ kaizens }) {
   };
 
   const handlePDFExport = () => {
-    setIsExporting('pdf');
-    const doc = new jsPDF();
-    
-    // Add Branding Header
-    doc.setFontSize(22);
-    doc.setTextColor(76, 29, 149); // #4c1d95
-    doc.text("KAIZORA PULSE REPORT", 14, 22);
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
-    doc.text("Corporate Improvement & Innovation Tracker", 14, 35);
+    try {
+      setIsExporting('pdf');
+      const doc = new jsPDF();
+      
+      // Add Branding Header
+      doc.setFontSize(22);
+      doc.setTextColor(76, 29, 149); // #4c1d95
+      doc.text("KAIZORA PULSE REPORT", 14, 22);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+      doc.text("Corporate Improvement & Innovation Tracker", 14, 35);
 
-    const tableData = kaizens.map(k => [
-      k.title,
-      k.profiles?.full_name || 'N/A',
-      k.status.toUpperCase(),
-      k.score || '0'
-    ]);
+      const tableData = kaizens.map(k => [
+        k.title || 'Untitled',
+        k.profiles?.full_name || 'N/A',
+        (k.status || 'PENDING').toUpperCase(),
+        k.score || '0'
+      ]);
 
-    doc.autoTable({
-      startY: 45,
-      head: [['Title', 'Innovator', 'Status', 'Score']],
-      body: tableData,
-      headStyles: { fillColor: [76, 29, 149] },
-      styles: { fontSize: 8 },
-      margin: { top: 40 }
-    });
+      // Use the explicit autoTable function for better reliability
+      autoTable(doc, {
+        startY: 45,
+        head: [['Title', 'Innovator', 'Status', 'Score']],
+        body: tableData,
+        headStyles: { fillColor: [76, 29, 149], fontStyle: 'bold' },
+        styles: { fontSize: 8, cellPadding: 3 },
+        alternateRowStyles: { fillColor: [245, 245, 250] },
+        margin: { top: 40 }
+      });
 
-    doc.save(`kaizora_executive_summary_${new Date().toISOString().split('T')[0]}.pdf`);
-    setIsExporting(null);
+      doc.save(`kaizora_executive_summary_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error("PDF Export failed:", error);
+    } finally {
+      setIsExporting(null);
+    }
   };
 
   return (

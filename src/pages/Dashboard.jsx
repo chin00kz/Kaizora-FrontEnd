@@ -32,11 +32,39 @@ export default function Dashboard() {
     queryFn: () => api.get("/kaizens").then((res) => res.data.data.kaizens),
   });
 
+  const impactScores = { low: 10, medium: 25, high: 50, critical: 100 };
+  const approvedKaizens = kaizens?.filter(k => k.status === 'approved') || [];
+  
+  const totalImpactPoints = approvedKaizens.reduce((sum, k) => sum + (impactScores[k.impact_level] || 0), 0);
+  const avgImpactScore = approvedKaizens.length > 0 ? totalImpactPoints / approvedKaizens.length : 0;
+
+  // Determine qualitative label based on average score
+  let dynamicImpact = "None";
+  if (avgImpactScore >= 75) dynamicImpact = "Critical";
+  else if (avgImpactScore >= 40) dynamicImpact = "High";
+  else if (avgImpactScore >= 20) dynamicImpact = "Medium";
+  else if (avgImpactScore > 0) dynamicImpact = "Low";
+
+  const { data: overview } = useQuery({
+    queryKey: ["analytics-overview"],
+    queryFn: () => api.get("/analytics/overview").then((res) => res.data.data),
+  });
+
+  const { data: healthData } = useQuery({
+    queryKey: ["health-check"],
+    queryFn: () => api.get("health").then((res) => res.data),
+    refetchInterval: 30000, // Check every 30s
+  });
+
   const stats = {
     total: kaizens?.length || 0,
-    approved: kaizens?.filter(k => k.status === 'approved').length || 0,
+    approved: approvedKaizens.length,
     pending: kaizens?.filter(k => k.status === 'pending').length || 0,
     rejected: kaizens?.filter(k => k.status === 'rejected').length || 0,
+    impactValue: dynamicImpact,
+    totalPoints: totalImpactPoints,
+    userCount: overview?.totalUsers || 0,
+    isStable: healthData?.status === 'OK'
   };
 
   const isStaff = profile?.role === 'employee';
@@ -94,10 +122,10 @@ export default function Dashboard() {
         />
         <StatCard
           title="Impact"
-          value="High"
+          value={stats.impactValue}
           icon={TrendingUp}
           color="bg-accent/10 text-accent"
-          label="Projected Savings"
+          label={`ROI: ${stats.totalPoints} pts`}
         />
       </div>
 
@@ -109,7 +137,7 @@ export default function Dashboard() {
               <CardTitle className="text-xl font-bold text-slate-900">Recent Stream</CardTitle>
               <p className="text-sm text-slate-500 font-medium">Latest updates from your environment.</p>
             </div>
-            <Button variant="ghost" size="sm" className="text-primary font-bold hover:bg-primary/5">
+            <Button variant="ghost" size="sm" className="text-primary font-bold hover:bg-primary/5" onClick={() => navigate("/my-kaizens")}>
               View All <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </CardHeader>
@@ -182,7 +210,7 @@ export default function Dashboard() {
                 <p className="text-primary-foreground/70 text-sm mb-6 leading-relaxed">
                   You have <span className="font-bold text-white">{stats.pending}</span> Kaizens awaiting your professional review.
                 </p>
-                <Button className="w-full bg-white text-primary hover:bg-white/90 font-bold h-12 rounded-xl shadow-lg">
+                <Button className="w-full bg-white text-primary hover:bg-white/90 font-bold h-12 rounded-xl shadow-lg" onClick={() => navigate("/qdm-portal")}>
                   Open Review Suite
                 </Button>
               </CardContent>
@@ -198,7 +226,7 @@ export default function Dashboard() {
                 <p className="text-white/70 text-sm mb-6 leading-relaxed">
                   Reviewing performance for <span className="font-bold text-white underline decoration-white/30 decoration-2 underline-offset-4">{profile?.departments?.name || "assigned"}</span> department.
                 </p>
-                <Button className="w-full bg-white/10 hover:bg-white/20 text-white border-white/20 font-bold h-12 rounded-xl">
+                <Button className="w-full bg-white/10 hover:bg-white/20 text-white border-white/20 font-bold h-12 rounded-xl" onClick={() => navigate("/analytics")}>
                   Manage Department
                 </Button>
               </CardContent>
@@ -209,12 +237,14 @@ export default function Dashboard() {
             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Quick Insights</h4>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="text-sm font-medium text-slate-700 leading-none">System Stability: 100%</span>
+                <div className={`w-2 h-2 rounded-full animate-pulse ${stats.isStable ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <span className="text-sm font-medium text-slate-700 leading-none">
+                  System Stability: {stats.isStable ? '100%' : 'Degraded'}
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-primary/40"></div>
-                <span className="text-sm font-medium text-slate-700 leading-none">Active Staff: {stats.total}</span>
+                <span className="text-sm font-medium text-slate-700 leading-none">Active Staff: {stats.userCount}</span>
               </div>
             </div>
           </div>
