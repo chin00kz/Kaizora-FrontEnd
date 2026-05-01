@@ -20,11 +20,14 @@ import {
   Terminal,
   Activity as ActivityIcon,
   Trash2 as TrashIcon,
-  Search
+  Search,
+  History,
+  FileText
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSystemStatus } from "@/context/SystemStatusContext";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -115,6 +118,14 @@ export default function SuperAdminConsole() {
           <span className="text-sm font-black text-red-600 uppercase tracking-widest">High Stakes Environment</span>
         </div>
       </div>
+
+      <Tabs defaultValue="controls" className="w-full">
+        <TabsList className="mb-6 p-1 bg-white border-slate-200/60 shadow-sm rounded-xl">
+          <TabsTrigger value="controls" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold tracking-wide">System Controls</TabsTrigger>
+          <TabsTrigger value="audit" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold tracking-wide">Audit Logs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="controls" className="space-y-10 animate-in fade-in zoom-in-95 duration-500">
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Tiered Maintenance Module */}
@@ -305,7 +316,79 @@ export default function SuperAdminConsole() {
           </div>
         </Card>
       )}
+        </TabsContent>
+        
+        <TabsContent value="audit" className="animate-in fade-in zoom-in-95 duration-500">
+          <AuditLogsViewer />
+        </TabsContent>
+      </Tabs>
     </div>
+  );
+}
+
+function AuditLogsViewer() {
+  const { data: auditLogs, isLoading } = useQuery({
+    queryKey: ["audit-logs"],
+    queryFn: () => api.get("/system/audit").then((res) => res.data.data.logs),
+  });
+
+  return (
+    <Card className="border-0 shadow-2xl rounded-[2rem] overflow-hidden bg-white">
+      <CardHeader className="bg-slate-50/50 p-8 border-b border-slate-100 flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="text-2xl font-black tracking-tight flex items-center gap-2">
+            <History className="w-6 h-6 text-primary" />
+            System Audit Log
+          </CardTitle>
+          <CardDescription className="text-slate-500 font-medium mt-1">Immutable record of all system events and user actions.</CardDescription>
+        </div>
+        <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5">
+          {auditLogs?.length || 0} Records Found
+        </Badge>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="max-h-[600px] overflow-y-auto">
+          {isLoading ? (
+            <div className="flex justify-center items-center p-20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary/50" />
+            </div>
+          ) : !auditLogs || auditLogs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <FileText className="w-12 h-12 mb-4 opacity-20" />
+              <p className="font-medium">No audit logs recorded yet.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {auditLogs.map((log) => (
+                <div key={log.id} className="p-4 px-8 hover:bg-slate-50/80 transition-colors flex items-center justify-between group">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-sm text-slate-900">{log.user_name}</span>
+                      <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600">
+                        {log.action.replace(/_/g, ' ')}
+                      </Badge>
+                    </div>
+                    <span className="text-xs text-slate-400 font-medium font-mono">
+                      {log.entity} / {log.entity_id || 'Global'}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 text-right">
+                    <span className="text-xs font-bold text-slate-500">
+                      {new Date(log.created_at).toLocaleString()}
+                    </span>
+                    {log.details && Object.keys(log.details).length > 0 && (
+                      <span className="text-[10px] text-slate-400 max-w-[200px] truncate">
+                        {JSON.stringify(log.details)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

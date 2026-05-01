@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { Loader2, ExternalLink, GitBranch, Eye, EyeOff, Heart } from "lucide-react"
+import api from "@/api/client"
 
 // Assets
 import authBg from "../assets/auth-bg.png"
@@ -51,6 +52,14 @@ export function LoginForm({
       setError(error.message)
       setLoading(false)
     } else {
+      try {
+        await api.post('/system/audit', {
+          action: 'LOGIN',
+          details: { platform: navigator.platform }
+        });
+      } catch (e) {
+        console.warn('Audit log failed:', e);
+      }
       navigate('/dashboard')
     }
   }
