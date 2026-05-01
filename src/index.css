@@ -33,14 +33,14 @@
   --radius: 0.75rem;
 
   /* Sidebar Variables */
-  --sidebar-background: 210 40% 98%;
-  --sidebar-foreground: 215.4 16.3% 46.9%;
-  --sidebar-primary: 268 75% 31%;
+  --sidebar-background: 268 75% 25%; /* Deep FedEx Purple */
+  --sidebar-foreground: 0 0% 100%;    /* White text */
+  --sidebar-primary: 24 100% 58%;    /* FedEx Orange for Primary actions */
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 210 40% 96.1%;
-  --sidebar-accent-foreground: 268 75% 31%;
-  --sidebar-border: 214.3 31.8% 91.4%;
-  --sidebar-ring: 24 100% 50%;
+  --sidebar-accent: 24 100% 58%;    /* FedEx Orange for Active/Hover */
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 268 75% 20%;
+  --sidebar-ring: 24 100% 58%;
 }
 
 * {
