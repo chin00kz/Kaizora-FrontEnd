@@ -25,7 +25,9 @@ export const SystemStatusProvider = ({ children }) => {
         setStatus({
           maintenance_mode: safeParse(rawStatus.maintenance_mode),
           maintenance_message: safeParse(rawStatus.maintenance_message),
-          api_debug_mode: safeParse(rawStatus.api_debug_mode)
+          api_debug_mode: safeParse(rawStatus.api_debug_mode),
+          hero_banner_image: rawStatus.hero_banner_image || '',
+          hero_banner_texts: safeParse(rawStatus.hero_banner_texts) || []
         });
       }
     } catch (error) {

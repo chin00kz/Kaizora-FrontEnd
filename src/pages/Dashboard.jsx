@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { HeroBanner } from "@/components/HeroBanner";
 
 export default function Dashboard() {
   const { profile } = useAuth();
@@ -45,6 +46,8 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-top-4 duration-700">
+      <HeroBanner />
+      
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">

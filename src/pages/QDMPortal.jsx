@@ -28,6 +28,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import IntelligenceHub from "./QDM/IntelligenceHub";
 import ReportForge from "./QDM/ReportForge";
+import { BannerEditor } from "@/components/BannerEditor";
+import { Settings } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -84,6 +86,9 @@ export default function QDMPortal() {
           </TabsTrigger>
           <TabsTrigger value="reports" className="rounded-xl px-6 py-2.5 font-bold text-xs uppercase tracking-widest gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#4c1d95]">
             <Download className="w-4 h-4" /> Data Forge
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="rounded-xl px-6 py-2.5 font-bold text-xs uppercase tracking-widest gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#4c1d95]">
+            <Settings className="w-4 h-4" /> Portal Settings
           </TabsTrigger>
         </TabsList>
 
@@ -175,6 +180,12 @@ export default function QDMPortal() {
 
         <TabsContent value="reports">
           <ReportForge kaizens={kaizens} />
+        </TabsContent>
+
+        <TabsContent value="settings" className="animate-in slide-in-from-bottom-4 duration-500">
+          <div className="max-w-4xl mx-auto">
+            <BannerEditor />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
