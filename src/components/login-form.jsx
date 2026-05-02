@@ -76,7 +76,7 @@ export function LoginForm({
               </div>
               <p className="text-xl font-black text-slate-900 mb-2 leading-tight">
                 Made with Love By <br />
-                <span className="text-primary italic">Madushi, Dasuni, Chanuka</span>
+                <span className="text-primary italic">Madhushi, Dasuni, Chanuka</span>
               </p>
               <div className="mt-6 flex gap-1">
                 <div className="w-1 h-1 bg-red-400 rounded-full"></div>
@@ -186,7 +186,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-[10px] text-slate-400 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary font-medium tracking-wide uppercase">
-        Protected by Intern security &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy</a>
+        Protected by Ex Intern security &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy</a>
       </div>
     </div>
   );
