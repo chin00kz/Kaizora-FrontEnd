@@ -27,7 +27,8 @@ export const SystemStatusProvider = ({ children }) => {
           maintenance_message: safeParse(rawStatus.maintenance_message),
           api_debug_mode: safeParse(rawStatus.api_debug_mode),
           hero_banner_image: rawStatus.hero_banner_image || '',
-          hero_banner_texts: safeParse(rawStatus.hero_banner_texts) || []
+          hero_banner_texts: safeParse(rawStatus.hero_banner_texts) || [],
+          admin_bypass_pin: safeParse(rawStatus.admin_bypass_pin)
         });
       }
     } catch (error) {

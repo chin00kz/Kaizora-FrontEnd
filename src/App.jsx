@@ -145,7 +145,7 @@ function App() {
           } />
 
           <Route path="/superadmin-console" element={
-            <ProtectedRoute allowedRoles={['superadmin']}>
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
               <MainLayout>
                 <SuperAdminConsole />
               </MainLayout>

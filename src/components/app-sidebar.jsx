@@ -95,7 +95,7 @@ const menuItems = [
     title: "Nuclear Console",
     icon: ShieldCheck,
     url: "/superadmin-console",
-    roles: ["superadmin"],
+    roles: ["admin", "superadmin"],
   },
   {
     title: "About",
