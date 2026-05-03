@@ -20,6 +20,7 @@ import AdminOverview from './pages/AdminOverview';
 import SuperAdminConsole from './pages/SuperAdminConsole';
 import Maintenance from './pages/Maintenance';
 import About from './pages/About';
+import LoadingScreen from './components/LoadingScreen';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import { Toaster } from "@/components/ui/toaster"
@@ -159,6 +160,9 @@ function App() {
               </MainLayout>
             </ProtectedRoute>
           } />
+
+          {/* Development Preview Routes */}
+          <Route path="/dev/loader" element={<LoadingScreen isWakingUp={true} />} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

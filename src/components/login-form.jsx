@@ -52,14 +52,11 @@ export function LoginForm({
       setError(error.message)
       setLoading(false)
     } else {
-      try {
-        await api.post('/system/audit', {
-          action: 'LOGIN',
-          details: { platform: navigator.platform }
-        });
-      } catch (e) {
-        console.warn('Audit log failed:', e);
-      }
+      // Fire and forget the audit log to avoid blocking the user on cold starts
+      api.post('/system/audit', {
+        action: 'LOGIN',
+        details: { platform: navigator.platform }
+      }).catch(e => console.warn('Audit log failed:', e));
       navigate('/dashboard')
     }
   }

@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
+import { useSystemStatus } from "@/context/SystemStatusContext";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/api/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +26,7 @@ import { HeroBanner } from "@/components/HeroBanner";
 
 export default function Dashboard() {
   const { profile } = useAuth();
+  const { isWakingUp } = useSystemStatus();
   const navigate = useNavigate();
 
   const { data: kaizens, isLoading } = useQuery({
@@ -143,7 +145,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="p-0">
             {isLoading ? (
-              <div className="p-8 text-center text-slate-400">Loading activity...</div>
+              <div className="p-8 text-center text-slate-400">
+                {isWakingUp ? "Waking up system engine..." : "Loading activity..."}
+              </div>
             ) : kaizens?.length === 0 ? (
               <div className="p-12 text-center">
                 <p className="text-slate-400 font-medium italic">No recent activity found.</p>

@@ -4,14 +4,21 @@ import api from '@/api/client';
 const SystemStatusContext = createContext({
   status: { maintenance_mode: 'none', maintenance_message: '' },
   isLoading: true,
+  isWakingUp: false,
   refreshStatus: () => {},
 });
 
 export const SystemStatusProvider = ({ children }) => {
   const [status, setStatus] = useState({ maintenance_mode: 'none', maintenance_message: '' });
+  const [isWakingUp, setIsWakingUp] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchStatus = async () => {
+    // Start a timer to detect "Cold Start" if the backend doesn't respond in 2.5 seconds
+    const wakingUpTimer = setTimeout(() => {
+      if (isLoading) setIsWakingUp(true);
+    }, 2500);
+
     try {
       const response = await api.get('/system/status');
       if (response.data.status === 'success') {
@@ -34,6 +41,8 @@ export const SystemStatusProvider = ({ children }) => {
     } catch (error) {
       console.error('[SystemStatusContext] Failed to fetch system status:', error);
     } finally {
+      clearTimeout(wakingUpTimer);
+      setIsWakingUp(false);
       setIsLoading(false);
     }
   };
@@ -46,7 +55,7 @@ export const SystemStatusProvider = ({ children }) => {
   }, []);
 
   return (
-    <SystemStatusContext.Provider value={{ status, isLoading, refreshStatus: fetchStatus }}>
+    <SystemStatusContext.Provider value={{ status, isLoading, isWakingUp, refreshStatus: fetchStatus }}>
       {children}
     </SystemStatusContext.Provider>
   );
