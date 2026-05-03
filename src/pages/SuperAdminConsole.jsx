@@ -22,7 +22,10 @@ import {
   Trash2 as TrashIcon,
   Search,
   History,
-  FileText
+  FileText,
+  Cpu,
+  Server,
+  Globe
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSystemStatus } from "@/context/SystemStatusContext";
@@ -395,7 +398,7 @@ export default function SuperAdminConsole() {
                 </Tooltip>
               </TooltipProvider>
 
-              {/* Quick Admin Toggles */}
+            {/* Quick Admin Toggles */}
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>

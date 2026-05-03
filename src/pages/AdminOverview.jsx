@@ -13,7 +13,8 @@ import {
   ShieldCheck,
   Globe,
   Terminal,
-  Loader2
+  Loader2,
+  Cpu
 } from "lucide-react";
 import {
   Table,
@@ -187,16 +188,67 @@ export default function AdminOverview() {
         </Card>
 
         <Card className="border-slate-200 shadow-sm rounded-[2rem] p-8 space-y-6">
-          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Environment Info</h4>
-          <div className="space-y-4">
-            <InfoRow icon={Terminal} label="Runtime" value={`Node ${healthResult?.nodeVersion || 'v20.x'}`} />
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-600">Environment</span>
-              <span className="text-xs font-bold text-slate-400 uppercase">{healthResult?.env || 'development'}</span>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Environment Info</h4>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter">Real-time</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-600">Region</span>
-              <span className="text-xs font-bold text-slate-400">{healthResult?.env === 'development' ? 'Localhost' : 'Cloud-Edge'}</span>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-center gap-3">
+                <Terminal className="w-4 h-4 text-slate-400" />
+                <span className="text-xs font-bold text-slate-700">Node Runtime</span>
+              </div>
+              <span className="text-xs font-black text-primary">{healthResult?.nodeVersion || 'v22.x'}</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="p-3 bg-white border border-slate-100 rounded-2xl space-y-1">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Hosting RAM</p>
+                <p className="text-sm font-black text-slate-800">{healthResult?.memory?.systemTotal || 0} GB</p>
+              </div>
+              <div className="p-3 bg-white border border-slate-100 rounded-2xl space-y-1">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Process ID</p>
+                <p className="text-sm font-black text-slate-800">PID {healthResult?.pid || '0000'}</p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-600">Server Host</span>
+                <span className="text-xs font-bold text-slate-400 truncate max-w-[120px]">{healthResult?.hostname || 'unknown'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-600">Database</span>
+                <Badge variant="outline" className={`text-[9px] h-5 font-black tracking-widest border-0 ${healthResult?.database === 'CONNECTED' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                  {healthResult?.database || 'CHECKING...'}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-600">Kernel Uptime</span>
+                <span className="text-xs font-bold text-slate-400">{formatUptime(healthResult?.osUptime)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-600">CPU Load (1m)</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-1000 ${healthResult?.loadAvg?.[0] > 0.8 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                      style={{ width: `${Math.min((healthResult?.loadAvg?.[0] || 0) * 100, 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-slate-400">{healthResult?.loadAvg?.[0]?.toFixed(2)}</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-600">Heap Usage</span>
+                <span className="text-xs font-bold text-slate-400">
+                  {healthResult?.memory?.heapUsed || 0}MB / {healthResult?.memory?.heapTotal || 0}MB
+                </span>
+              </div>
             </div>
           </div>
         </Card>
@@ -222,14 +274,3 @@ function PulseCard({ title, value, icon: Icon, color, detail }) {
   );
 }
 
-function InfoRow({ icon: Icon, label, value }) {
-  return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Icon className="w-4 h-4 text-slate-400" />
-        <span className="text-sm font-medium text-slate-600">{label}</span>
-      </div>
-      <span className="text-xs font-bold text-slate-400">{value}</span>
-    </div>
-  );
-}
