@@ -58,6 +58,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.fullscreen-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 @layer base {
   * {
     @apply border-border;
